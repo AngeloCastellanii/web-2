@@ -1,187 +1,187 @@
 // ==========================================
-// PAYROLL SYSTEM - DATA MODEL (ENGLISH)
+// SISTEMA DE NÓMINA - MODELADO DE DATOS
 // ==========================================
 
 // ------------------------------------------
-// 1. IDENTITY & ACCESS CONTROL (RBAC)
+// 1. IDENTIDAD Y CONTROL DE ACCESO (RBAC)
 // ------------------------------------------
 
-Table person {
-  person_id int [pk, increment]
-  first_name varchar(100) [not null]
-  last_name varchar(100) [not null]
-  national_id varchar(20) [unique, not null]
-  birth_date date
-  created_at timestamp [default: `now()`]
-  updated_at timestamp [default: `now()`]
+Table Persona {
+  id_persona int [pk, increment]
+  nombre varchar(100) [not null]
+  apellido varchar(100) [not null]
+  cedula varchar(20) [unique, not null]
+  fecha_nacimiento date
+  creado_en timestamp [default: `now()`]
+  actualizado_en timestamp [default: `now()`]
 }
 
-Table user {
-  user_id int [pk, increment]
-  person_id int [ref: - person.person_id, not null, unique]
-  email varchar(150) [unique, not null]
+Table Usuario {
+  id_usuario int [pk, increment]
+  id_persona int [ref: - Persona.id_persona, not null, unique]
+  correo varchar(150) [unique, not null]
   password_hash varchar(255) [not null]
-  is_active boolean [default: true, not null]
-  created_at timestamp [default: `now()`]
-  updated_at timestamp [default: `now()`]
+  activo boolean [default: true, not null]
+  creado_en timestamp [default: `now()`]
+  actualizado_en timestamp [default: `now()`]
 }
 
-Table profile {
-  profile_id int [pk, increment]
-  name varchar(50) [unique, not null] // Admin, HR, Employee
-  description varchar(255)
+Table Perfil {
+  id_perfil int [pk, increment]
+  nombre varchar(50) [unique, not null] // Administrador, RRHH, Empleado
+  descripcion varchar(255)
 }
 
-Table user_profile {
-  user_profile_id int [pk, increment]
-  user_id int [ref: > user.user_id, not null]
-  profile_id int [ref: > profile.profile_id, not null]
+Table Usuario_Perfil {
+  id_usuario_perfil int [pk, increment]
+  id_usuario int [ref: > Usuario.id_usuario, not null]
+  id_perfil int [ref: > Perfil.id_perfil, not null]
 
   indexes {
-    (user_id, profile_id) [unique]
+    (id_usuario, id_perfil) [unique]
   }
 }
 
-// Security objects for course-style reflection /proccess
-Table object {
-  object_id int [pk, increment]
-  object_de varchar(100) [unique, not null] // BO class name: Employee, Payroll, ...
+// Seguridad para /proccess (objeto + método + permiso)
+Table Objeto {
+  id_objeto int [pk, increment]
+  nombre_objeto varchar(100) [unique, not null] // Nombre de clase BO
 }
 
-Table method {
-  method_id int [pk, increment]
-  object_id int [ref: > object.object_id, not null]
-  method_de varchar(100) [not null] // Method name on BO class
-  method_atx boolean [default: true] // Active flag
+Table Metodo {
+  id_metodo int [pk, increment]
+  id_objeto int [ref: > Objeto.id_objeto, not null]
+  nombre_metodo varchar(100) [not null]
+  activo boolean [default: true]
 
   indexes {
-    (object_id, method_de) [unique]
+    (id_objeto, nombre_metodo) [unique]
   }
 }
 
-Table permission {
-  permission_id int [pk, increment]
-  profile_id int [ref: > profile.profile_id, not null]
-  method_id int [ref: > method.method_id, not null]
+Table Permiso {
+  id_permiso int [pk, increment]
+  id_perfil int [ref: > Perfil.id_perfil, not null]
+  id_metodo int [ref: > Metodo.id_metodo, not null]
 
   indexes {
-    (profile_id, method_id) [unique]
+    (id_perfil, id_metodo) [unique]
   }
 }
 
 // ------------------------------------------
-// 2. ORGANIZATION & EMPLOYEES
+// 2. ORGANIZACIÓN Y EMPLEADOS
 // ------------------------------------------
 
-Table department {
-  department_id int [pk, increment]
-  name varchar(100) [unique, not null]
-  description varchar(255)
-  is_active boolean [default: true, not null]
-  created_at timestamp [default: `now()`]
+Table Departamento {
+  id_departamento int [pk, increment]
+  nombre varchar(100) [unique, not null]
+  descripcion varchar(255)
+  activo boolean [default: true, not null]
+  creado_en timestamp [default: `now()`]
 }
 
-Table position {
-  position_id int [pk, increment]
-  name varchar(100) [unique, not null]
-  description varchar(255)
-  is_active boolean [default: true, not null]
-  created_at timestamp [default: `now()`]
+Table Cargo {
+  id_cargo int [pk, increment]
+  nombre varchar(100) [unique, not null]
+  descripcion varchar(255)
+  activo boolean [default: true, not null]
+  creado_en timestamp [default: `now()`]
 }
 
-Table pay_frequency {
-  pay_frequency_id int [pk, increment]
-  name varchar(50) [unique, not null] // WEEKLY, BIWEEKLY, MONTHLY
-  description varchar(255)
+Table Periodicidad {
+  id_periodicidad int [pk, increment]
+  nombre varchar(50) [unique, not null] // Semanal, Quincenal, Mensual
+  descripcion varchar(255)
 }
 
-Table employee {
-  employee_id int [pk, increment]
-  person_id int [ref: - person.person_id, not null, unique]
-  hire_date date [not null]
-  pay_modality varchar(20) [not null] // HOURLY | FIXED
-  base_salary decimal(12,2) [not null] // Hourly rate or fixed salary
-  pay_frequency_id int [ref: > pay_frequency.pay_frequency_id, not null]
-  department_id int [ref: > department.department_id, not null]
-  position_id int [ref: > position.position_id, not null]
-  is_active boolean [default: true, not null]
-  created_at timestamp [default: `now()`]
-  updated_at timestamp [default: `now()`]
+Table Empleado {
+  id_empleado int [pk, increment]
+  id_persona int [ref: - Persona.id_persona, not null, unique]
+  fecha_ingreso date [not null]
+  modalidad_pago varchar(20) [not null] // POR_HORA | SALARIO_FIJO
+  salario_base decimal(12,2) [not null] // Tarifa por hora o sueldo fijo
+  id_periodicidad int [ref: > Periodicidad.id_periodicidad, not null]
+  id_departamento int [ref: > Departamento.id_departamento, not null]
+  id_cargo int [ref: > Cargo.id_cargo, not null]
+  activo boolean [default: true, not null]
+  creado_en timestamp [default: `now()`]
+  actualizado_en timestamp [default: `now()`]
 }
 
 // ------------------------------------------
-// 3. PAYROLL & CONCEPTS
+// 3. NÓMINA Y CONCEPTOS
 // ------------------------------------------
 
-Table payroll {
-  payroll_id int [pk, increment]
-  start_date date [not null]
-  end_date date [not null]
-  pay_date date
-  status varchar(20) [default: 'DRAFT', not null] // DRAFT (n times) | FINALIZED (once)
-  pay_frequency_id int [ref: > pay_frequency.pay_frequency_id, not null]
-  notes varchar(255)
-  created_at timestamp [default: `now()`]
-  updated_at timestamp [default: `now()`]
+Table Nomina {
+  id_nomina int [pk, increment]
+  fecha_inicio date [not null]
+  fecha_fin date [not null]
+  fecha_pago date
+  estado varchar(20) [default: 'PRE_NOMINA', not null] // PRE_NOMINA (n veces) | NOMINA (1 vez)
+  id_periodicidad int [ref: > Periodicidad.id_periodicidad, not null]
+  notas varchar(255)
+  creado_en timestamp [default: `now()`]
+  actualizado_en timestamp [default: `now()`]
 }
 
-Table payroll_entry {
-  payroll_entry_id int [pk, increment]
-  payroll_id int [ref: > payroll.payroll_id, not null]
-  employee_id int [ref: > employee.employee_id, not null]
-  total_earnings decimal(12,2) [default: 0.00, not null] // CREDIT sum
-  total_deductions decimal(12,2) [default: 0.00, not null] // DEBIT sum
-  net_total decimal(12,2) [default: 0.00, not null]
-  created_at timestamp [default: `now()`]
+Table Registro_Nomina {
+  id_registro int [pk, increment]
+  id_nomina int [ref: > Nomina.id_nomina, not null]
+  id_empleado int [ref: > Empleado.id_empleado, not null]
+  total_ingresos decimal(12,2) [default: 0.00, not null] // Suma que acredita
+  total_deducciones decimal(12,2) [default: 0.00, not null] // Suma que debita
+  total_neto decimal(12,2) [default: 0.00, not null]
+  creado_en timestamp [default: `now()`]
 
   indexes {
-    (payroll_id, employee_id) [unique]
+    (id_nomina, id_empleado) [unique]
   }
 }
 
-Table concept {
-  concept_id int [pk, increment]
-  name varchar(100) [unique, not null]
-  effect varchar(10) [not null] // CREDIT | DEBIT
-  category varchar(50) [not null] // LEGAL_DEDUCTION | OPTIONAL | BONUS | OVERTIME | LOAN | BASE_SALARY
-  is_automatic boolean [default: false, not null]
-  calc_type varchar(30) // PERCENT_SALARY | FIXED_AMOUNT | MANUAL
-  calc_value decimal(12,4) // e.g. 0.0400 for 4%
-  is_active boolean [default: true, not null]
-  created_at timestamp [default: `now()`]
+Table Concepto {
+  id_concepto int [pk, increment]
+  nombre varchar(100) [unique, not null]
+  efecto varchar(10) [not null] // ACREDITA | DEBITA
+  categoria varchar(50) [not null] // DESCUENTO_LEY | OPCIONAL | BONO | HORA_EXTRA | PRESTAMO | SALARIO_BASE
+  es_automatico boolean [default: false, not null]
+  tipo_calculo varchar(30) // PORCENTAJE_SALARIO | MONTO_FIJO | MANUAL
+  valor_calculo decimal(12,4) // Ej: 0.0400 para 4%
+  activo boolean [default: true, not null]
+  creado_en timestamp [default: `now()`]
 }
 
-Table payroll_detail {
-  payroll_detail_id int [pk, increment]
-  payroll_entry_id int [ref: > payroll_entry.payroll_entry_id, not null]
-  concept_id int [ref: > concept.concept_id, not null]
-  quantity decimal(12,2) [default: 1.00, not null] // Overtime hours, days worked, etc.
-  amount decimal(12,2) [not null]
-  created_at timestamp [default: `now()`]
+Table Detalle_Nomina {
+  id_detalle int [pk, increment]
+  id_registro int [ref: > Registro_Nomina.id_registro, not null]
+  id_concepto int [ref: > Concepto.id_concepto, not null]
+  cantidad decimal(12,2) [default: 1.00, not null] // Horas extras, días, etc.
+  monto decimal(12,2) [not null]
+  creado_en timestamp [default: `now()`]
 }
 
-Table payment {
-  payment_id int [pk, increment]
-  payroll_entry_id int [ref: > payroll_entry.payroll_entry_id, not null]
-  payment_date date [not null]
-  amount decimal(12,2) [not null]
-  payment_method varchar(50) // TRANSFER | CASH | CHECK
-  notes varchar(255)
-  created_at timestamp [default: `now()`]
+Table Pago {
+  id_pago int [pk, increment]
+  id_registro int [ref: > Registro_Nomina.id_registro, not null]
+  fecha_pago date [not null]
+  monto decimal(12,2) [not null]
+  metodo_pago varchar(50) // TRANSFERENCIA | EFECTIVO | CHEQUE
+  observaciones varchar(255)
+  creado_en timestamp [default: `now()`]
 }
 
 // ------------------------------------------
-// 4. LOANS
+// 4. PRÉSTAMOS
 // ------------------------------------------
 
-Table loan {
-  loan_id int [pk, increment]
-  employee_id int [ref: > employee.employee_id, not null]
-  total_amount decimal(12,2) [not null]
-  remaining_balance decimal(12,2) [not null]
-  installment decimal(12,2) [not null]
-  start_date date [not null]
-  status varchar(20) [default: 'ACTIVE', not null] // ACTIVE | PAID
-  created_at timestamp [default: `now()`]
-  updated_at timestamp [default: `now()`]
+Table Prestamo {
+  id_prestamo int [pk, increment]
+  id_empleado int [ref: > Empleado.id_empleado, not null]
+  monto_total decimal(12,2) [not null]
+  saldo_pendiente decimal(12,2) [not null]
+  cuota decimal(12,2) [not null]
+  fecha_inicio date [not null]
+  estado varchar(20) [default: 'ACTIVO', not null] // ACTIVO | PAGADO
+  creado_en timestamp [default: `now()`]
+  actualizado_en timestamp [default: `now()`]
 }

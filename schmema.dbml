@@ -1,6 +1,10 @@
 // ==========================================
-// 1. IDENTIDAD Y CONTROL DE ACCESO (RBAC)
+// SISTEMA DE NÓMINA - MODELADO DE DATOS
 // ==========================================
+
+// ------------------------------------------
+// 1. IDENTIDAD Y CONTROL DE ACCESO (RBAC)
+// ------------------------------------------
 
 Table Persona {
   id_persona int [pk, increment]
@@ -8,19 +12,23 @@ Table Persona {
   apellido varchar(100) [not null]
   cedula varchar(20) [unique, not null]
   fecha_nacimiento date
+  creado_en timestamp [default: `now()`]
+  actualizado_en timestamp [default: `now()`]
 }
 
 Table Usuario {
   id_usuario int [pk, increment]
-  id_persona int [ref: - Persona.id_persona, not null] // Relación 1 a 1
-  correo varchar(150) [unique, not null] // Credencial de inicio de sesión
-  password_hash varchar(255) [not null] // Contraseña encriptada
-  estado boolean [default: true] // true = Activo, false = Inactivo (Soft delete)
+  id_persona int [ref: - Persona.id_persona, not null, unique]
+  correo varchar(150) [unique, not null]
+  password_hash varchar(255) [not null]
+  activo boolean [default: true, not null]
+  creado_en timestamp [default: `now()`]
+  actualizado_en timestamp [default: `now()`]
 }
 
 Table Perfil {
   id_perfil int [pk, increment]
-  nombre varchar(50) [not null] // Ej. 'Administrador', 'RRHH', 'Empleado'
+  nombre varchar(50) [unique, not null] // Administrador, RRHH, Empleado
   descripcion varchar(255)
 }
 
@@ -28,99 +36,152 @@ Table Usuario_Perfil {
   id_usuario_perfil int [pk, increment]
   id_usuario int [ref: > Usuario.id_usuario, not null]
   id_perfil int [ref: > Perfil.id_perfil, not null]
+
+  indexes {
+    (id_usuario, id_perfil) [unique]
+  }
 }
 
-// ==========================================
-// 2. ESTRUCTURA ORGANIZACIONAL Y EMPLEADOS
-// ==========================================
+// Seguridad para /proccess (objeto + método + permiso)
+Table Objeto {
+  id_objeto int [pk, increment]
+  nombre_objeto varchar(100) [unique, not null] // Nombre de clase BO
+}
+
+Table Metodo {
+  id_metodo int [pk, increment]
+  id_objeto int [ref: > Objeto.id_objeto, not null]
+  nombre_metodo varchar(100) [not null]
+  activo boolean [default: true]
+
+  indexes {
+    (id_objeto, nombre_metodo) [unique]
+  }
+}
+
+Table Permiso {
+  id_permiso int [pk, increment]
+  id_perfil int [ref: > Perfil.id_perfil, not null]
+  id_metodo int [ref: > Metodo.id_metodo, not null]
+
+  indexes {
+    (id_perfil, id_metodo) [unique]
+  }
+}
+
+// ------------------------------------------
+// 2. ORGANIZACIÓN Y EMPLEADOS
+// ------------------------------------------
 
 Table Departamento {
   id_departamento int [pk, increment]
-  nombre varchar(100) [not null]
+  nombre varchar(100) [unique, not null]
   descripcion varchar(255)
+  activo boolean [default: true, not null]
+  creado_en timestamp [default: `now()`]
 }
 
 Table Cargo {
   id_cargo int [pk, increment]
-  nombre varchar(100) [not null]
+  nombre varchar(100) [unique, not null]
   descripcion varchar(255)
+  activo boolean [default: true, not null]
+  creado_en timestamp [default: `now()`]
 }
 
 Table Periodicidad {
   id_periodicidad int [pk, increment]
-  nombre varchar(50) [not null] // 'Mensual', 'Quincenal', 'Semanal'
+  nombre varchar(50) [unique, not null] // Semanal, Quincenal, Mensual
+  descripcion varchar(255)
 }
 
 Table Empleado {
   id_empleado int [pk, increment]
-  id_persona int [ref: - Persona.id_persona, not null] // Relación 1 a 1 con datos personales
+  id_persona int [ref: - Persona.id_persona, not null, unique]
   fecha_ingreso date [not null]
-  modalidad_pago varchar(30) [not null] // 'Por hora trabajada' o 'Salario fijo'
-  salario_base decimal(10,2) [not null] // Valor por hora o sueldo fijo
+  modalidad_pago varchar(20) [not null] // POR_HORA | SALARIO_FIJO
+  salario_base decimal(12,2) [not null] // Tarifa por hora o sueldo fijo
   id_periodicidad int [ref: > Periodicidad.id_periodicidad, not null]
   id_departamento int [ref: > Departamento.id_departamento, not null]
   id_cargo int [ref: > Cargo.id_cargo, not null]
+  activo boolean [default: true, not null]
+  creado_en timestamp [default: `now()`]
+  actualizado_en timestamp [default: `now()`]
 }
 
-// ==========================================
+// ------------------------------------------
 // 3. NÓMINA Y CONCEPTOS
-// ==========================================
+// ------------------------------------------
 
 Table Nomina {
   id_nomina int [pk, increment]
   fecha_inicio date [not null]
   fecha_fin date [not null]
   fecha_pago date
-  estado varchar(30) [default: 'Pre-nómina'] // 'Pre-nómina' (n veces) o 'Nómina' (1 vez)
+  estado varchar(20) [default: 'PRE_NOMINA', not null] // PRE_NOMINA (n veces) | NOMINA (1 vez)
   id_periodicidad int [ref: > Periodicidad.id_periodicidad, not null]
+  notas varchar(255)
+  creado_en timestamp [default: `now()`]
+  actualizado_en timestamp [default: `now()`]
 }
 
 Table Registro_Nomina {
   id_registro int [pk, increment]
   id_nomina int [ref: > Nomina.id_nomina, not null]
   id_empleado int [ref: > Empleado.id_empleado, not null]
-  total_ingresos decimal(10,2) [default: 0.00] // Suma de lo que Acredita
-  total_deducciones decimal(10,2) [default: 0.00] // Suma de lo que Debita
-  total_neto decimal(10,2) [default: 0.00]
+  total_ingresos decimal(12,2) [default: 0.00, not null] // Suma que acredita
+  total_deducciones decimal(12,2) [default: 0.00, not null] // Suma que debita
+  total_neto decimal(12,2) [default: 0.00, not null]
+  creado_en timestamp [default: `now()`]
+
+  indexes {
+    (id_nomina, id_empleado) [unique]
+  }
 }
 
 Table Concepto {
   id_concepto int [pk, increment]
-  nombre varchar(100) [not null]
-  efecto varchar(20) [not null] // '+ Acredita' o '- Debita'
-  categoria varchar(50) [not null] // 'Descuento de ley', 'Opcional', 'Bono', 'Hora extra', 'Préstamo'
-  es_automatico boolean [default: false] // true para generación automática
-  tipo_calculo varchar(30) // 'Porcentaje_Salario', 'Monto_Fijo', 'Manual'
-  valor_calculo decimal(10,4) // Ej: 0.0400 para 4%
+  nombre varchar(100) [unique, not null]
+  efecto varchar(10) [not null] // ACREDITA | DEBITA
+  categoria varchar(50) [not null] // DESCUENTO_LEY | OPCIONAL | BONO | HORA_EXTRA | PRESTAMO | SALARIO_BASE
+  es_automatico boolean [default: false, not null]
+  tipo_calculo varchar(30) // PORCENTAJE_SALARIO | MONTO_FIJO | MANUAL
+  valor_calculo decimal(12,4) // Ej: 0.0400 para 4%
+  activo boolean [default: true, not null]
+  creado_en timestamp [default: `now()`]
 }
 
 Table Detalle_Nomina {
   id_detalle int [pk, increment]
   id_registro int [ref: > Registro_Nomina.id_registro, not null]
   id_concepto int [ref: > Concepto.id_concepto, not null]
-  cantidad decimal(10,2) [default: 1.00] // Horas extras, días trabajados, etc.
-  monto decimal(10,2) [not null] // Impacto financiero resultante
+  cantidad decimal(12,2) [default: 1.00, not null] // Horas extras, días, etc.
+  monto decimal(12,2) [not null]
+  creado_en timestamp [default: `now()`]
 }
 
 Table Pago {
   id_pago int [pk, increment]
   id_registro int [ref: > Registro_Nomina.id_registro, not null]
   fecha_pago date [not null]
-  monto decimal(10,2) [not null]
-  metodo_pago varchar(50) // 'Transferencia', 'Efectivo', 'Cheque'
+  monto decimal(12,2) [not null]
+  metodo_pago varchar(50) // TRANSFERENCIA | EFECTIVO | CHEQUE
   observaciones varchar(255)
+  creado_en timestamp [default: `now()`]
 }
 
-// ==========================================
-// 4. GESTIÓN DE PRÉSTAMOS
-// ==========================================
+// ------------------------------------------
+// 4. PRÉSTAMOS
+// ------------------------------------------
+
 Table Prestamo {
   id_prestamo int [pk, increment]
   id_empleado int [ref: > Empleado.id_empleado, not null]
-  monto_total decimal(10,2) [not null]
-  saldo_pendiente decimal(10,2) [not null]
-  cuota decimal(10,2) [not null]
+  monto_total decimal(12,2) [not null]
+  saldo_pendiente decimal(12,2) [not null]
+  cuota decimal(12,2) [not null]
   fecha_inicio date [not null]
-  estado varchar(30) [default: 'Activo'] // 'Activo', 'Pagado'
-   }
-
+  estado varchar(20) [default: 'ACTIVO', not null] // ACTIVO | PAGADO
+  creado_en timestamp [default: `now()`]
+  actualizado_en timestamp [default: `now()`]
+}

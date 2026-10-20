@@ -1,4 +1,4 @@
-const Loan = class {
+﻿const Loan = class {
   constructor(obj) {
     this.obj = obj;
   }
@@ -6,7 +6,7 @@ const Loan = class {
   listLoans() {
     db.query(query.Loan.listLoans, []).then((r) => {
       if (r === false) {
-        this.obj.res.send(JSON.stringify({ msg: 'Error listing loans', err: 'sql error' }));
+        this.obj.res.send(JSON.stringify({ msg: 'Error al listar préstamos', err: 'error sql' }));
         return;
       }
       this.obj.res.send(JSON.stringify({ msg: 'ok', data: r }));
@@ -18,7 +18,7 @@ const Loan = class {
       if (r && r.length > 0) {
         this.obj.res.send(JSON.stringify({ msg: 'ok', data: r[0] }));
       } else {
-        this.obj.res.send(JSON.stringify({ msg: 'Loan not found', err: 'not found' }));
+        this.obj.res.send(JSON.stringify({ msg: 'Loan no encontrado', err: 'no encontrado' }));
       }
     });
   }
@@ -34,9 +34,9 @@ const Loan = class {
       status || 'ACTIVE'
     ]).then((r) => {
       if (r && r.length > 0) {
-        this.obj.res.send(JSON.stringify({ msg: 'Loan created', data: r[0] }));
+        this.obj.res.send(JSON.stringify({ msg: 'Préstamo creado', data: r[0] }));
       } else {
-        this.obj.res.send(JSON.stringify({ msg: 'Error creating loan', err: 'sql error' }));
+        this.obj.res.send(JSON.stringify({ msg: 'Error al crear préstamo', err: 'error sql' }));
       }
     });
   }
@@ -44,9 +44,9 @@ const Loan = class {
   updateLoan(id, remainingBalance, installment, status) {
     db.query(query.Loan.updateLoan, [id, remainingBalance, installment, status]).then((r) => {
       if (r && r.length > 0) {
-        this.obj.res.send(JSON.stringify({ msg: 'Loan updated', data: r[0] }));
+        this.obj.res.send(JSON.stringify({ msg: 'Préstamo actualizado', data: r[0] }));
       } else {
-        this.obj.res.send(JSON.stringify({ msg: 'Error updating loan', err: 'sql error' }));
+        this.obj.res.send(JSON.stringify({ msg: 'Error al actualizar préstamo', err: 'error sql' }));
       }
     });
   }
@@ -54,9 +54,9 @@ const Loan = class {
   deleteLoan(id) {
     db.query(query.Loan.deleteLoan, [id]).then((r) => {
       if (r && r.length > 0) {
-        this.obj.res.send(JSON.stringify({ msg: 'Loan closed', data: r[0] }));
+        this.obj.res.send(JSON.stringify({ msg: 'Préstamo cerrado', data: r[0] }));
       } else {
-        this.obj.res.send(JSON.stringify({ msg: 'Error closing loan', err: 'sql error' }));
+        this.obj.res.send(JSON.stringify({ msg: 'Error al cerrar préstamo', err: 'error sql' }));
       }
     });
   }

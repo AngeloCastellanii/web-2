@@ -1,4 +1,4 @@
-const Department = class {
+﻿const Department = class {
   constructor(obj) {
     this.obj = obj;
   }
@@ -6,7 +6,7 @@ const Department = class {
   listDepartments() {
     db.query(query.Department.listDepartments, []).then((r) => {
       if (r === false) {
-        this.obj.res.send(JSON.stringify({ msg: 'Error listing departments', err: 'sql error' }));
+        this.obj.res.send(JSON.stringify({ msg: 'Error al listar departamentos', err: 'error sql' }));
         return;
       }
       this.obj.res.send(JSON.stringify({ msg: 'ok', data: r }));
@@ -18,7 +18,7 @@ const Department = class {
       if (r && r.length > 0) {
         this.obj.res.send(JSON.stringify({ msg: 'ok', data: r[0] }));
       } else {
-        this.obj.res.send(JSON.stringify({ msg: 'Department not found', err: 'not found' }));
+        this.obj.res.send(JSON.stringify({ msg: 'Department no encontrado', err: 'no encontrado' }));
       }
     });
   }
@@ -26,9 +26,9 @@ const Department = class {
   insertDepartment(name, description) {
     db.query(query.Department.insertDepartment, [name, description || null]).then((r) => {
       if (r && r.length > 0) {
-        this.obj.res.send(JSON.stringify({ msg: 'Department created', data: r[0] }));
+        this.obj.res.send(JSON.stringify({ msg: 'Departamento creado', data: r[0] }));
       } else {
-        this.obj.res.send(JSON.stringify({ msg: 'Error creating department', err: 'sql error' }));
+        this.obj.res.send(JSON.stringify({ msg: 'Error al crear departamento', err: 'error sql' }));
       }
     });
   }
@@ -36,9 +36,9 @@ const Department = class {
   updateDepartment(id, name, description) {
     db.query(query.Department.updateDepartment, [id, name, description || null]).then((r) => {
       if (r && r.length > 0) {
-        this.obj.res.send(JSON.stringify({ msg: 'Department updated', data: r[0] }));
+        this.obj.res.send(JSON.stringify({ msg: 'Departamento actualizado', data: r[0] }));
       } else {
-        this.obj.res.send(JSON.stringify({ msg: 'Error updating department', err: 'sql error' }));
+        this.obj.res.send(JSON.stringify({ msg: 'Error al actualizar departamento', err: 'error sql' }));
       }
     });
   }
@@ -46,9 +46,9 @@ const Department = class {
   deleteDepartment(id) {
     db.query(query.Department.deleteDepartment, [id]).then((r) => {
       if (r && r.length > 0) {
-        this.obj.res.send(JSON.stringify({ msg: 'Department deactivated', data: r[0] }));
+        this.obj.res.send(JSON.stringify({ msg: 'Departamento desactivado', data: r[0] }));
       } else {
-        this.obj.res.send(JSON.stringify({ msg: 'Error deleting department', err: 'sql error' }));
+        this.obj.res.send(JSON.stringify({ msg: 'Error al eliminar departamento', err: 'error sql' }));
       }
     });
   }

@@ -1,4 +1,4 @@
-const Person = class {
+﻿const Person = class {
   constructor(obj) {
     this.obj = obj;
   }
@@ -6,7 +6,7 @@ const Person = class {
   listPersons() {
     db.query(query.Person.listPersons, []).then((r) => {
       if (r === false) {
-        this.obj.res.send(JSON.stringify({ msg: 'Error listing persons', err: 'sql error' }));
+        this.obj.res.send(JSON.stringify({ msg: 'Error al listar personas', err: 'error sql' }));
         return;
       }
       this.obj.res.send(JSON.stringify({ msg: 'ok', data: r }));
@@ -18,7 +18,7 @@ const Person = class {
       if (r && r.length > 0) {
         this.obj.res.send(JSON.stringify({ msg: 'ok', data: r[0] }));
       } else {
-        this.obj.res.send(JSON.stringify({ msg: 'Person not found', err: 'not found' }));
+        this.obj.res.send(JSON.stringify({ msg: 'Person no encontrado', err: 'no encontrado' }));
       }
     });
   }
@@ -31,9 +31,9 @@ const Person = class {
       birthDate || null
     ]).then((r) => {
       if (r && r.length > 0) {
-        this.obj.res.send(JSON.stringify({ msg: 'Person created', data: r[0] }));
+        this.obj.res.send(JSON.stringify({ msg: 'Persona creada', data: r[0] }));
       } else {
-        this.obj.res.send(JSON.stringify({ msg: 'Error creating person', err: 'sql error' }));
+        this.obj.res.send(JSON.stringify({ msg: 'Error al crear persona', err: 'error sql' }));
       }
     });
   }
@@ -47,9 +47,9 @@ const Person = class {
       birthDate || null
     ]).then((r) => {
       if (r && r.length > 0) {
-        this.obj.res.send(JSON.stringify({ msg: 'Person updated', data: r[0] }));
+        this.obj.res.send(JSON.stringify({ msg: 'Persona actualizada', data: r[0] }));
       } else {
-        this.obj.res.send(JSON.stringify({ msg: 'Error updating person', err: 'sql error' }));
+        this.obj.res.send(JSON.stringify({ msg: 'Error al actualizar persona', err: 'error sql' }));
       }
     });
   }
@@ -57,9 +57,9 @@ const Person = class {
   deletePerson(id) {
     db.query(query.Person.deletePerson, [id]).then((r) => {
       if (r && r.length > 0) {
-        this.obj.res.send(JSON.stringify({ msg: 'Person deleted', data: r[0] }));
+        this.obj.res.send(JSON.stringify({ msg: 'Persona eliminada', data: r[0] }));
       } else {
-        this.obj.res.send(JSON.stringify({ msg: 'Error deleting person', err: 'sql error' }));
+        this.obj.res.send(JSON.stringify({ msg: 'Error al eliminar persona', err: 'error sql' }));
       }
     });
   }

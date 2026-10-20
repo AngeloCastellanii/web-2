@@ -7,9 +7,31 @@ const Valid = require('./Validate');
 const DBComponent = require('./DBComponent');
 const Session = require('./Session');
 const Security = require('./Security');
+const Reflex = require('./Reflex');
 const Logger = require('./Log');
 
+function deepMerge(base, overlay) {
+  const out = { ...base };
+  Object.keys(overlay || {}).forEach((key) => {
+    if (
+      overlay[key] &&
+      typeof overlay[key] === 'object' &&
+      !Array.isArray(overlay[key])
+    ) {
+      out[key] = deepMerge(base[key] || {}, overlay[key]);
+    } else {
+      out[key] = overlay[key];
+    }
+  });
+  return out;
+}
+
 global.config = JSON.parse(fs.readFileSync(path.join(__dirname, 'config.json'), 'utf8'));
+const localConfigPath = path.join(__dirname, 'config.local.json');
+if (fs.existsSync(localConfigPath)) {
+  const localConfig = JSON.parse(fs.readFileSync(localConfigPath, 'utf8'));
+  global.config = deepMerge(global.config, localConfig);
+}
 if (process.env.PGPASSWORD) config.db.password = process.env.PGPASSWORD;
 if (process.env.PGPORT) config.db.port = Number(process.env.PGPORT);
 if (process.env.PGDATABASE) config.db.database = process.env.PGDATABASE;
@@ -21,10 +43,13 @@ global.log = new Logger(fs);
 global.valid = new Valid();
 
 const app = express();
-global.sess = new Session(session, app);
-global.sec = new Security();
 
-log.info('Starting payroll framework...');
+// Capas: Session | Reflex (classMap) | Security (permissionMap) | Validate (validationMap)
+global.sess = new Session(session, app);
+global.reflex = new Reflex();
+global.sec = new Security(global.reflex);
+
+log.info('Iniciando framework de nómina...');
 
 app.use(
   cors({
@@ -36,27 +61,30 @@ app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.get('/', (req, res) => {
-  res.send(JSON.stringify({ msg: 'Payroll API running', status: 'ok' }));
+  res.send(JSON.stringify({ msg: 'API de nómina activa', status: 'ok' }));
 });
 
+/**
+ * Único punto de entrada de negocio.
+ * El servidor no conoce BOs:
+ * sesión -> permiso (Map) -> ValidationMap -> Reflex.execute
+ */
 app.post('/proccess', (req, res) => {
-  if (sess.sessionExist(req)) {
-    const j = {
-      object_de: req.body.object_de,
-      method_de: req.body.method_de,
-      profile_id: req.session.sessionObj.profile_id,
-      params: req.body.params || [],
-      req,
-      res
-    };
-    if (sec.getPermission(j)) {
-      sec.exeMethod(j);
-    } else {
-      res.send(JSON.stringify({ msg: 'Access denied' }));
-    }
-  } else {
-    res.end(JSON.stringify({ msg: 'You must log in first' }));
+  if (!sess.sessionExist(req)) {
+    res.end(JSON.stringify({ msg: 'Debe iniciar sesión primero' }));
+    return;
   }
+
+  const ctx = {
+    object_de: req.body.object_de,
+    method_de: req.body.method_de,
+    profile_id: req.session.sessionObj.profile_id,
+    params: req.body.params || [],
+    req,
+    res
+  };
+
+  sec.exeMethod(ctx);
 });
 
 app.post('/login', (req, res) => {
@@ -73,9 +101,9 @@ app.get('/me', (req, res) => {
 
 app.listen(config.server.port, () => {
   console.log(
-    `Payroll server active at http://${config.server.ip}:${config.server.port}`
+    `Servidor de nómina activo en http://${config.server.ip}:${config.server.port}`
   );
   log.info(
-    `Server active at http://${config.server.ip}:${config.server.port}`
+    `Servidor activo en http://${config.server.ip}:${config.server.port}`
   );
 });

@@ -22,10 +22,10 @@ const Session = class {
   logout(req, res) {
     req.session.destroy((err) => {
       if (err) {
-        res.status(500).send(JSON.stringify({ msg: 'Logout error' }));
+        res.status(500).send(JSON.stringify({ msg: 'Error al cerrar sesión' }));
         return;
       }
-      res.send(JSON.stringify({ msg: 'Session ended' }));
+      res.send(JSON.stringify({ msg: 'Sesión finalizada' }));
     });
   }
 
@@ -36,7 +36,7 @@ const Session = class {
           this.createSession(req, r);
           res.end(
             JSON.stringify({
-              msg: `Session created for ${r[0].email}`,
+              msg: `Sesión creada para ${r[0].email}`,
               user: {
                 user_id: r[0].user_id,
                 email: r[0].email,
@@ -47,11 +47,11 @@ const Session = class {
             })
           );
         } else {
-          res.end(JSON.stringify({ msg: 'User does not exist' }));
+          res.end(JSON.stringify({ msg: 'Usuario o contraseña incorrectos' }));
         }
       });
     } else {
-      res.end(JSON.stringify({ msg: 'Invalid login data' }));
+      res.end(JSON.stringify({ msg: 'Datos de inicio de sesión inválidos' }));
     }
   }
 
@@ -59,7 +59,7 @@ const Session = class {
     if (this.sessionExist(req)) {
       res.send(JSON.stringify({ user: req.session.sessionObj }));
     } else {
-      res.status(401).send(JSON.stringify({ msg: 'No active session' }));
+      res.status(401).send(JSON.stringify({ msg: 'No hay sesión activa' }));
     }
   }
 

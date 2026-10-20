@@ -1,11 +1,11 @@
-# Payroll System (MVP)
+# Sistema de Nómina (MVP)
 
-Sistema de nómina con arquitectura CursoNode: `Session` + `Security` + `/proccess` + BOs.
+Backend Node + frontend React. Session, Security, Reflex y ValidationMap.
 
 ## Estructura
 
-- `schema.dbml` — modelado en inglés
-- `backend/` — Node.js + Express + PostgreSQL
+- `schema.dbml` / `schmema.dbml` — modelado de datos
+- `backend/` — API Node + PostgreSQL
 - `frontend/` — React + Vite
 
 ## Requisitos
@@ -13,17 +13,26 @@ Sistema de nómina con arquitectura CursoNode: `Session` + `Security` + `/procce
 - Node.js + pnpm
 - PostgreSQL local
 
-## Base de datos
+## Configuración (secretos)
 
-Ajusta usuario/password en `backend/config.json` (por defecto `postgres`/`postgres`, puerto `5432`).
+Los passwords **no** van en el repo.
+
+```bash
+cd backend
+copy config.example.json config.local.json
+```
+
+Edita `backend/config.local.json` y pon tu password de Postgres (ese archivo está en `.gitignore`).
+
+También puedes usar la variable `PGPASSWORD`.
+
+## Base de datos
 
 ```bash
 createdb -U postgres payroll
 psql -U postgres -d payroll -f backend/sql/schema.sql
 psql -U postgres -d payroll -f backend/sql/seed.sql
 ```
-
-También puedes usar `PGPASSWORD` si tu password local es distinta.
 
 ## Backend
 
@@ -33,7 +42,7 @@ pnpm install
 pnpm start
 ```
 
-API en `http://localhost:8000`
+API: `http://localhost:8000`
 
 ## Frontend
 
@@ -43,9 +52,9 @@ pnpm install
 pnpm dev
 ```
 
-App en `http://localhost:5173`
+App: `http://localhost:5173`
 
 ## Login demo
 
-- Email: `admin@payroll.local`
-- Password: `admin123`
+- Correo: `admin@payroll.local`
+- Contraseña: `admin123`

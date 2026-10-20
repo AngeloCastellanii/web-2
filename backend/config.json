@@ -3,12 +3,12 @@
     "user": "postgres",
     "host": "localhost",
     "database": "payroll",
-    "password": "postgres",
+    "password": "",
     "port": 5432
   },
   "session": {
     "name": "payroll_session",
-    "secret": "payroll_secret_key_change_me",
+    "secret": "cambia_este_secreto",
     "resave": false,
     "saveUninitialized": false,
     "cookie": {

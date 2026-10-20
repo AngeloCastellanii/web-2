@@ -1,4 +1,4 @@
-const PayFrequency = class {
+﻿const PayFrequency = class {
   constructor(obj) {
     this.obj = obj;
   }
@@ -6,7 +6,7 @@ const PayFrequency = class {
   listPayFrequencies() {
     db.query(query.PayFrequency.listPayFrequencies, []).then((r) => {
       if (r === false) {
-        this.obj.res.send(JSON.stringify({ msg: 'Error listing pay frequencies', err: 'sql error' }));
+        this.obj.res.send(JSON.stringify({ msg: 'Error al listar periodicidades', err: 'error sql' }));
         return;
       }
       this.obj.res.send(JSON.stringify({ msg: 'ok', data: r }));
@@ -18,7 +18,7 @@ const PayFrequency = class {
       if (r && r.length > 0) {
         this.obj.res.send(JSON.stringify({ msg: 'ok', data: r[0] }));
       } else {
-        this.obj.res.send(JSON.stringify({ msg: 'Pay frequency not found', err: 'not found' }));
+        this.obj.res.send(JSON.stringify({ msg: 'Pay frequency no encontrado', err: 'no encontrado' }));
       }
     });
   }

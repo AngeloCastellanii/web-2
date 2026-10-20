@@ -1,4 +1,4 @@
-const Concept = class {
+﻿const Concept = class {
   constructor(obj) {
     this.obj = obj;
   }
@@ -6,7 +6,7 @@ const Concept = class {
   listConcepts() {
     db.query(query.Concept.listConcepts, []).then((r) => {
       if (r === false) {
-        this.obj.res.send(JSON.stringify({ msg: 'Error listing concepts', err: 'sql error' }));
+        this.obj.res.send(JSON.stringify({ msg: 'Error al listar conceptos', err: 'error sql' }));
         return;
       }
       this.obj.res.send(JSON.stringify({ msg: 'ok', data: r }));
@@ -18,7 +18,7 @@ const Concept = class {
       if (r && r.length > 0) {
         this.obj.res.send(JSON.stringify({ msg: 'ok', data: r[0] }));
       } else {
-        this.obj.res.send(JSON.stringify({ msg: 'Concept not found', err: 'not found' }));
+        this.obj.res.send(JSON.stringify({ msg: 'Concept no encontrado', err: 'no encontrado' }));
       }
     });
   }
@@ -33,9 +33,9 @@ const Concept = class {
       calcValue || null
     ]).then((r) => {
       if (r && r.length > 0) {
-        this.obj.res.send(JSON.stringify({ msg: 'Concept created', data: r[0] }));
+        this.obj.res.send(JSON.stringify({ msg: 'Concepto creado', data: r[0] }));
       } else {
-        this.obj.res.send(JSON.stringify({ msg: 'Error creating concept', err: 'sql error' }));
+        this.obj.res.send(JSON.stringify({ msg: 'Error al crear concepto', err: 'error sql' }));
       }
     });
   }
@@ -51,9 +51,9 @@ const Concept = class {
       calcValue || null
     ]).then((r) => {
       if (r && r.length > 0) {
-        this.obj.res.send(JSON.stringify({ msg: 'Concept updated', data: r[0] }));
+        this.obj.res.send(JSON.stringify({ msg: 'Concepto actualizado', data: r[0] }));
       } else {
-        this.obj.res.send(JSON.stringify({ msg: 'Error updating concept', err: 'sql error' }));
+        this.obj.res.send(JSON.stringify({ msg: 'Error al actualizar concepto', err: 'error sql' }));
       }
     });
   }
@@ -61,9 +61,9 @@ const Concept = class {
   deleteConcept(id) {
     db.query(query.Concept.deleteConcept, [id]).then((r) => {
       if (r && r.length > 0) {
-        this.obj.res.send(JSON.stringify({ msg: 'Concept deactivated', data: r[0] }));
+        this.obj.res.send(JSON.stringify({ msg: 'Concepto desactivado', data: r[0] }));
       } else {
-        this.obj.res.send(JSON.stringify({ msg: 'Error deleting concept', err: 'sql error' }));
+        this.obj.res.send(JSON.stringify({ msg: 'Error al eliminar concepto', err: 'error sql' }));
       }
     });
   }

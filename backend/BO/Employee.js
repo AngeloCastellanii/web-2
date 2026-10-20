@@ -1,4 +1,4 @@
-const Employee = class {
+﻿const Employee = class {
   constructor(obj) {
     this.obj = obj;
   }
@@ -6,7 +6,7 @@ const Employee = class {
   listEmployees() {
     db.query(query.Employee.listEmployees, []).then((r) => {
       if (r === false) {
-        this.obj.res.send(JSON.stringify({ msg: 'Error listing employees', err: 'sql error' }));
+        this.obj.res.send(JSON.stringify({ msg: 'Error al listar empleados', err: 'error sql' }));
         return;
       }
       this.obj.res.send(JSON.stringify({ msg: 'ok', data: r }));
@@ -18,7 +18,7 @@ const Employee = class {
       if (r && r.length > 0) {
         this.obj.res.send(JSON.stringify({ msg: 'ok', data: r[0] }));
       } else {
-        this.obj.res.send(JSON.stringify({ msg: 'Employee not found', err: 'not found' }));
+        this.obj.res.send(JSON.stringify({ msg: 'Employee no encontrado', err: 'no encontrado' }));
       }
     });
   }
@@ -34,9 +34,9 @@ const Employee = class {
       positionId
     ]).then((r) => {
       if (r && r.length > 0) {
-        this.obj.res.send(JSON.stringify({ msg: 'Employee created', data: r[0] }));
+        this.obj.res.send(JSON.stringify({ msg: 'Empleado creado', data: r[0] }));
       } else {
-        this.obj.res.send(JSON.stringify({ msg: 'Error creating employee', err: 'sql error' }));
+        this.obj.res.send(JSON.stringify({ msg: 'Error al crear empleado', err: 'error sql' }));
       }
     });
   }
@@ -52,9 +52,9 @@ const Employee = class {
       positionId
     ]).then((r) => {
       if (r && r.length > 0) {
-        this.obj.res.send(JSON.stringify({ msg: 'Employee updated', data: r[0] }));
+        this.obj.res.send(JSON.stringify({ msg: 'Empleado actualizado', data: r[0] }));
       } else {
-        this.obj.res.send(JSON.stringify({ msg: 'Error updating employee', err: 'sql error' }));
+        this.obj.res.send(JSON.stringify({ msg: 'Error al actualizar empleado', err: 'error sql' }));
       }
     });
   }
@@ -62,9 +62,9 @@ const Employee = class {
   deleteEmployee(id) {
     db.query(query.Employee.deleteEmployee, [id]).then((r) => {
       if (r && r.length > 0) {
-        this.obj.res.send(JSON.stringify({ msg: 'Employee deactivated', data: r[0] }));
+        this.obj.res.send(JSON.stringify({ msg: 'Empleado desactivado', data: r[0] }));
       } else {
-        this.obj.res.send(JSON.stringify({ msg: 'Error deleting employee', err: 'sql error' }));
+        this.obj.res.send(JSON.stringify({ msg: 'Error al eliminar empleado', err: 'error sql' }));
       }
     });
   }

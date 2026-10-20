@@ -1,4 +1,4 @@
-const Payroll = class {
+﻿const Payroll = class {
   constructor(obj) {
     this.obj = obj;
   }
@@ -6,7 +6,7 @@ const Payroll = class {
   listPayrolls() {
     db.query(query.Payroll.listPayrolls, []).then((r) => {
       if (r === false) {
-        this.obj.res.send(JSON.stringify({ msg: 'Error listing payrolls', err: 'sql error' }));
+        this.obj.res.send(JSON.stringify({ msg: 'Error al listar nóminas', err: 'error sql' }));
         return;
       }
       this.obj.res.send(JSON.stringify({ msg: 'ok', data: r }));
@@ -18,7 +18,7 @@ const Payroll = class {
       if (r && r.length > 0) {
         this.obj.res.send(JSON.stringify({ msg: 'ok', data: r[0] }));
       } else {
-        this.obj.res.send(JSON.stringify({ msg: 'Payroll not found', err: 'not found' }));
+        this.obj.res.send(JSON.stringify({ msg: 'Payroll no encontrado', err: 'no encontrado' }));
       }
     });
   }
@@ -34,9 +34,9 @@ const Payroll = class {
       notes || null
     ]).then((r) => {
       if (r && r.length > 0) {
-        this.obj.res.send(JSON.stringify({ msg: 'Payroll created', data: r[0] }));
+        this.obj.res.send(JSON.stringify({ msg: 'Nómina creada', data: r[0] }));
       } else {
-        this.obj.res.send(JSON.stringify({ msg: 'Error creating payroll', err: 'sql error' }));
+        this.obj.res.send(JSON.stringify({ msg: 'Error al crear nómina', err: 'error sql' }));
       }
     });
   }
@@ -52,12 +52,12 @@ const Payroll = class {
       notes || null
     ]).then((r) => {
       if (r && r.length > 0) {
-        this.obj.res.send(JSON.stringify({ msg: 'Payroll updated', data: r[0] }));
+        this.obj.res.send(JSON.stringify({ msg: 'Nómina actualizada', data: r[0] }));
       } else {
         this.obj.res.send(
           JSON.stringify({
-            msg: 'Error updating payroll (only DRAFT can be edited)',
-            err: 'sql error'
+            msg: 'Error al actualizar nómina (solo borrador se puede editar)',
+            err: 'error sql'
           })
         );
       }
@@ -67,12 +67,12 @@ const Payroll = class {
   deletePayroll(id) {
     db.query(query.Payroll.deletePayroll, [id]).then((r) => {
       if (r && r.length > 0) {
-        this.obj.res.send(JSON.stringify({ msg: 'Payroll deleted', data: r[0] }));
+        this.obj.res.send(JSON.stringify({ msg: 'Nómina eliminada', data: r[0] }));
       } else {
         this.obj.res.send(
           JSON.stringify({
-            msg: 'Error deleting payroll (only DRAFT can be deleted)',
-            err: 'sql error'
+            msg: 'Error al eliminar nómina (solo borrador se puede eliminar)',
+            err: 'error sql'
           })
         );
       }
