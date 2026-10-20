@@ -1,0 +1,62 @@
+{
+  "Session": {
+    "authenticate": "SELECT u.user_id, u.email, u.person_id, p.first_name, p.last_name, up.profile_id FROM \"user\" u INNER JOIN person p ON p.person_id = u.person_id INNER JOIN user_profile up ON up.user_id = u.user_id WHERE u.email = $1 AND u.password_hash = $2 AND u.is_active = TRUE LIMIT 1"
+  },
+  "Security": {
+    "loadPermissions": "SELECT o.object_de, m.method_de, pr.profile_id FROM permission pe INNER JOIN profile pr ON pr.profile_id = pe.profile_id INNER JOIN method m ON m.method_id = pe.method_id INNER JOIN object o ON o.object_id = m.object_id WHERE m.method_atx = TRUE"
+  },
+  "Department": {
+    "listDepartments": "SELECT * FROM department ORDER BY department_id",
+    "findDepartment": "SELECT * FROM department WHERE department_id = $1",
+    "insertDepartment": "INSERT INTO department (name, description) VALUES ($1, $2) RETURNING *",
+    "updateDepartment": "UPDATE department SET name = $2, description = $3 WHERE department_id = $1 RETURNING *",
+    "deleteDepartment": "UPDATE department SET is_active = FALSE WHERE department_id = $1 RETURNING *"
+  },
+  "Position": {
+    "listPositions": "SELECT * FROM position ORDER BY position_id",
+    "findPosition": "SELECT * FROM position WHERE position_id = $1",
+    "insertPosition": "INSERT INTO position (name, description) VALUES ($1, $2) RETURNING *",
+    "updatePosition": "UPDATE position SET name = $2, description = $3 WHERE position_id = $1 RETURNING *",
+    "deletePosition": "UPDATE position SET is_active = FALSE WHERE position_id = $1 RETURNING *"
+  },
+  "PayFrequency": {
+    "listPayFrequencies": "SELECT * FROM pay_frequency ORDER BY pay_frequency_id",
+    "findPayFrequency": "SELECT * FROM pay_frequency WHERE pay_frequency_id = $1"
+  },
+  "Person": {
+    "listPersons": "SELECT * FROM person ORDER BY person_id",
+    "findPerson": "SELECT * FROM person WHERE person_id = $1",
+    "findPersonByNationalId": "SELECT * FROM person WHERE national_id = $1",
+    "insertPerson": "INSERT INTO person (first_name, last_name, national_id, birth_date) VALUES ($1, $2, $3, $4) RETURNING *",
+    "updatePerson": "UPDATE person SET first_name = $2, last_name = $3, national_id = $4, birth_date = $5, updated_at = NOW() WHERE person_id = $1 RETURNING *",
+    "deletePerson": "DELETE FROM person WHERE person_id = $1 RETURNING *"
+  },
+  "Employee": {
+    "listEmployees": "SELECT e.*, p.first_name, p.last_name, p.national_id, d.name AS department_name, pos.name AS position_name, pf.name AS pay_frequency_name FROM employee e INNER JOIN person p ON p.person_id = e.person_id INNER JOIN department d ON d.department_id = e.department_id INNER JOIN position pos ON pos.position_id = e.position_id INNER JOIN pay_frequency pf ON pf.pay_frequency_id = e.pay_frequency_id ORDER BY e.employee_id",
+    "findEmployee": "SELECT e.*, p.first_name, p.last_name, p.national_id, d.name AS department_name, pos.name AS position_name, pf.name AS pay_frequency_name FROM employee e INNER JOIN person p ON p.person_id = e.person_id INNER JOIN department d ON d.department_id = e.department_id INNER JOIN position pos ON pos.position_id = e.position_id INNER JOIN pay_frequency pf ON pf.pay_frequency_id = e.pay_frequency_id WHERE e.employee_id = $1",
+    "insertEmployee": "INSERT INTO employee (person_id, hire_date, pay_modality, base_salary, pay_frequency_id, department_id, position_id) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *",
+    "updateEmployee": "UPDATE employee SET hire_date = $2, pay_modality = $3, base_salary = $4, pay_frequency_id = $5, department_id = $6, position_id = $7, updated_at = NOW() WHERE employee_id = $1 RETURNING *",
+    "deleteEmployee": "UPDATE employee SET is_active = FALSE, updated_at = NOW() WHERE employee_id = $1 RETURNING *"
+  },
+  "Concept": {
+    "listConcepts": "SELECT * FROM concept ORDER BY concept_id",
+    "findConcept": "SELECT * FROM concept WHERE concept_id = $1",
+    "insertConcept": "INSERT INTO concept (name, effect, category, is_automatic, calc_type, calc_value) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *",
+    "updateConcept": "UPDATE concept SET name = $2, effect = $3, category = $4, is_automatic = $5, calc_type = $6, calc_value = $7 WHERE concept_id = $1 RETURNING *",
+    "deleteConcept": "UPDATE concept SET is_active = FALSE WHERE concept_id = $1 RETURNING *"
+  },
+  "Payroll": {
+    "listPayrolls": "SELECT pr.*, pf.name AS pay_frequency_name FROM payroll pr INNER JOIN pay_frequency pf ON pf.pay_frequency_id = pr.pay_frequency_id ORDER BY pr.payroll_id DESC",
+    "findPayroll": "SELECT pr.*, pf.name AS pay_frequency_name FROM payroll pr INNER JOIN pay_frequency pf ON pf.pay_frequency_id = pr.pay_frequency_id WHERE pr.payroll_id = $1",
+    "insertPayroll": "INSERT INTO payroll (start_date, end_date, pay_date, status, pay_frequency_id, notes) VALUES ($1, $2, $3, COALESCE($4, 'DRAFT'), $5, $6) RETURNING *",
+    "updatePayroll": "UPDATE payroll SET start_date = $2, end_date = $3, pay_date = $4, status = $5, pay_frequency_id = $6, notes = $7, updated_at = NOW() WHERE payroll_id = $1 AND status = 'DRAFT' RETURNING *",
+    "deletePayroll": "DELETE FROM payroll WHERE payroll_id = $1 AND status = 'DRAFT' RETURNING *"
+  },
+  "Loan": {
+    "listLoans": "SELECT l.*, p.first_name, p.last_name FROM loan l INNER JOIN employee e ON e.employee_id = l.employee_id INNER JOIN person p ON p.person_id = e.person_id ORDER BY l.loan_id DESC",
+    "findLoan": "SELECT l.*, p.first_name, p.last_name FROM loan l INNER JOIN employee e ON e.employee_id = l.employee_id INNER JOIN person p ON p.person_id = e.person_id WHERE l.loan_id = $1",
+    "insertLoan": "INSERT INTO loan (employee_id, total_amount, remaining_balance, installment, start_date, status) VALUES ($1, $2, $3, $4, $5, COALESCE($6, 'ACTIVE')) RETURNING *",
+    "updateLoan": "UPDATE loan SET remaining_balance = $2, installment = $3, status = $4, updated_at = NOW() WHERE loan_id = $1 RETURNING *",
+    "deleteLoan": "UPDATE loan SET status = 'PAID', remaining_balance = 0, updated_at = NOW() WHERE loan_id = $1 RETURNING *"
+  }
+}

@@ -1,0 +1,35 @@
+{
+  "db": {
+    "user": "postgres",
+    "host": "localhost",
+    "database": "payroll",
+    "password": "postgres",
+    "port": 5432
+  },
+  "session": {
+    "name": "payroll_session",
+    "secret": "payroll_secret_key_change_me",
+    "resave": false,
+    "saveUninitialized": false,
+    "cookie": {
+      "secure": false,
+      "httpOnly": true,
+      "maxAge": 3600000,
+      "sameSite": "lax"
+    }
+  },
+  "server": {
+    "port": 8000,
+    "ip": "localhost"
+  },
+  "cors": {
+    "origin": "http://localhost:5173"
+  },
+  "log": {
+    "maxLine": 20,
+    "ecoWarning": true,
+    "ecoError": true,
+    "ecoDebug": true,
+    "ecoInfo": true
+  }
+}

@@ -1,0 +1,126 @@
+// ==========================================
+// 1. IDENTIDAD Y CONTROL DE ACCESO (RBAC)
+// ==========================================
+
+Table Persona {
+  id_persona int [pk, increment]
+  nombre varchar(100) [not null]
+  apellido varchar(100) [not null]
+  cedula varchar(20) [unique, not null]
+  fecha_nacimiento date
+}
+
+Table Usuario {
+  id_usuario int [pk, increment]
+  id_persona int [ref: - Persona.id_persona, not null] // Relación 1 a 1
+  correo varchar(150) [unique, not null] // Credencial de inicio de sesión
+  password_hash varchar(255) [not null] // Contraseña encriptada
+  estado boolean [default: true] // true = Activo, false = Inactivo (Soft delete)
+}
+
+Table Perfil {
+  id_perfil int [pk, increment]
+  nombre varchar(50) [not null] // Ej. 'Administrador', 'RRHH', 'Empleado'
+  descripcion varchar(255)
+}
+
+Table Usuario_Perfil {
+  id_usuario_perfil int [pk, increment]
+  id_usuario int [ref: > Usuario.id_usuario, not null]
+  id_perfil int [ref: > Perfil.id_perfil, not null]
+}
+
+// ==========================================
+// 2. ESTRUCTURA ORGANIZACIONAL Y EMPLEADOS
+// ==========================================
+
+Table Departamento {
+  id_departamento int [pk, increment]
+  nombre varchar(100) [not null]
+  descripcion varchar(255)
+}
+
+Table Cargo {
+  id_cargo int [pk, increment]
+  nombre varchar(100) [not null]
+  descripcion varchar(255)
+}
+
+Table Periodicidad {
+  id_periodicidad int [pk, increment]
+  nombre varchar(50) [not null] // 'Mensual', 'Quincenal', 'Semanal'
+}
+
+Table Empleado {
+  id_empleado int [pk, increment]
+  id_persona int [ref: - Persona.id_persona, not null] // Relación 1 a 1 con datos personales
+  fecha_ingreso date [not null]
+  modalidad_pago varchar(30) [not null] // 'Por hora trabajada' o 'Salario fijo'
+  salario_base decimal(10,2) [not null] // Valor por hora o sueldo fijo
+  id_periodicidad int [ref: > Periodicidad.id_periodicidad, not null]
+  id_departamento int [ref: > Departamento.id_departamento, not null]
+  id_cargo int [ref: > Cargo.id_cargo, not null]
+}
+
+// ==========================================
+// 3. NÓMINA Y CONCEPTOS
+// ==========================================
+
+Table Nomina {
+  id_nomina int [pk, increment]
+  fecha_inicio date [not null]
+  fecha_fin date [not null]
+  fecha_pago date
+  estado varchar(30) [default: 'Pre-nómina'] // 'Pre-nómina' (n veces) o 'Nómina' (1 vez)
+  id_periodicidad int [ref: > Periodicidad.id_periodicidad, not null]
+}
+
+Table Registro_Nomina {
+  id_registro int [pk, increment]
+  id_nomina int [ref: > Nomina.id_nomina, not null]
+  id_empleado int [ref: > Empleado.id_empleado, not null]
+  total_ingresos decimal(10,2) [default: 0.00] // Suma de lo que Acredita
+  total_deducciones decimal(10,2) [default: 0.00] // Suma de lo que Debita
+  total_neto decimal(10,2) [default: 0.00]
+}
+
+Table Concepto {
+  id_concepto int [pk, increment]
+  nombre varchar(100) [not null]
+  efecto varchar(20) [not null] // '+ Acredita' o '- Debita'
+  categoria varchar(50) [not null] // 'Descuento de ley', 'Opcional', 'Bono', 'Hora extra', 'Préstamo'
+  es_automatico boolean [default: false] // true para generación automática
+  tipo_calculo varchar(30) // 'Porcentaje_Salario', 'Monto_Fijo', 'Manual'
+  valor_calculo decimal(10,4) // Ej: 0.0400 para 4%
+}
+
+Table Detalle_Nomina {
+  id_detalle int [pk, increment]
+  id_registro int [ref: > Registro_Nomina.id_registro, not null]
+  id_concepto int [ref: > Concepto.id_concepto, not null]
+  cantidad decimal(10,2) [default: 1.00] // Horas extras, días trabajados, etc.
+  monto decimal(10,2) [not null] // Impacto financiero resultante
+}
+
+Table Pago {
+  id_pago int [pk, increment]
+  id_registro int [ref: > Registro_Nomina.id_registro, not null]
+  fecha_pago date [not null]
+  monto decimal(10,2) [not null]
+  metodo_pago varchar(50) // 'Transferencia', 'Efectivo', 'Cheque'
+  observaciones varchar(255)
+}
+
+// ==========================================
+// 4. GESTIÓN DE PRÉSTAMOS
+// ==========================================
+Table Prestamo {
+  id_prestamo int [pk, increment]
+  id_empleado int [ref: > Empleado.id_empleado, not null]
+  monto_total decimal(10,2) [not null]
+  saldo_pendiente decimal(10,2) [not null]
+  cuota decimal(10,2) [not null]
+  fecha_inicio date [not null]
+  estado varchar(30) [default: 'Activo'] // 'Activo', 'Pagado'
+   }
+
