@@ -21,7 +21,7 @@ export function AuthProvider({ children }) {
       setUser(r.user);
       return { ok: true, msg: r.msg };
     }
-    return { ok: false, msg: r.msg || 'Login failed' };
+    return { ok: false, msg: r.msg || 'Error al iniciar sesión' };
   }
 
   async function logout() {

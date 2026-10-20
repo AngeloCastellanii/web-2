@@ -24,10 +24,10 @@ export default function Login() {
   return (
     <div className="login-page">
       <form className="login-card" onSubmit={onSubmit}>
-        <h1>PayRoll</h1>
+        <h1>Nómina</h1>
         <p>Sistema de nómina — inicia sesión</p>
         <div className="field">
-          <label htmlFor="email">Email</label>
+          <label htmlFor="email">Correo</label>
           <input
             id="email"
             type="email"
@@ -37,7 +37,7 @@ export default function Login() {
           />
         </div>
         <div className="field">
-          <label htmlFor="password">Password</label>
+          <label htmlFor="password">Contraseña</label>
           <div className="password-field">
             <input
               id="password"

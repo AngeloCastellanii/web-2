@@ -10,6 +10,13 @@ const empty = {
   notes: ''
 };
 
+const statusLabel = { DRAFT: 'Borrador', FINALIZED: 'Finalizada' };
+const freqLabel = {
+  WEEKLY: 'Semanal',
+  BIWEEKLY: 'Quincenal',
+  MONTHLY: 'Mensual'
+};
+
 export default function Payrolls() {
   const [rows, setRows] = useState([]);
   const [freqs, setFreqs] = useState([]);
@@ -69,7 +76,7 @@ export default function Payrolls() {
 
   function startEdit(row) {
     if (row.status !== 'DRAFT') {
-      setMsg('Only DRAFT payrolls can be edited');
+      setMsg('Solo se pueden editar nóminas en borrador');
       return;
     }
     setEditId(row.payroll_id);
@@ -92,12 +99,12 @@ export default function Payrolls() {
   return (
     <div>
       <div className="page-header">
-        <h2>Payrolls</h2>
+        <h2>Nóminas</h2>
       </div>
       <div className="panel">
         <form onSubmit={onSubmit} className="form-grid">
           <div className="field">
-            <label>Start date</label>
+            <label>Fecha inicio</label>
             <input
               type="date"
               value={form.start_date}
@@ -106,7 +113,7 @@ export default function Payrolls() {
             />
           </div>
           <div className="field">
-            <label>End date</label>
+            <label>Fecha fin</label>
             <input
               type="date"
               value={form.end_date}
@@ -115,7 +122,7 @@ export default function Payrolls() {
             />
           </div>
           <div className="field">
-            <label>Pay date</label>
+            <label>Fecha de pago</label>
             <input
               type="date"
               value={form.pay_date}
@@ -123,36 +130,36 @@ export default function Payrolls() {
             />
           </div>
           <div className="field">
-            <label>Pay frequency</label>
+            <label>Periodicidad</label>
             <select
               value={form.pay_frequency_id}
               onChange={(e) => setField('pay_frequency_id', e.target.value)}
               required
             >
-              <option value="">Select…</option>
+              <option value="">Seleccionar…</option>
               {freqs.map((f) => (
                 <option key={f.pay_frequency_id} value={f.pay_frequency_id}>
-                  {f.name}
+                  {freqLabel[f.name] || f.name}
                 </option>
               ))}
             </select>
           </div>
           {editId && (
             <div className="field">
-              <label>Status</label>
+              <label>Estado</label>
               <select value={form.status} onChange={(e) => setField('status', e.target.value)}>
-                <option value="DRAFT">DRAFT</option>
-                <option value="FINALIZED">FINALIZED</option>
+                <option value="DRAFT">Borrador</option>
+                <option value="FINALIZED">Finalizada</option>
               </select>
             </div>
           )}
           <div className="field">
-            <label>Notes</label>
+            <label>Notas</label>
             <input value={form.notes} onChange={(e) => setField('notes', e.target.value)} />
           </div>
           <div className="field" style={{ alignSelf: 'end' }}>
             <div className="actions">
-              <button type="submit">{editId ? 'Update' : 'Create DRAFT'}</button>
+              <button type="submit">{editId ? 'Actualizar' : 'Crear borrador'}</button>
               {editId && (
                 <button
                   type="button"
@@ -162,7 +169,7 @@ export default function Payrolls() {
                     setForm(empty);
                   }}
                 >
-                  Cancel
+                  Cancelar
                 </button>
               )}
             </div>
@@ -175,11 +182,11 @@ export default function Payrolls() {
           <thead>
             <tr>
               <th>ID</th>
-              <th>Period</th>
-              <th>Pay date</th>
-              <th>Frequency</th>
-              <th>Status</th>
-              <th>Notes</th>
+              <th>Período</th>
+              <th>Fecha de pago</th>
+              <th>Periodicidad</th>
+              <th>Estado</th>
+              <th>Notas</th>
               <th />
             </tr>
           </thead>
@@ -191,17 +198,17 @@ export default function Payrolls() {
                   {String(r.start_date).slice(0, 10)} → {String(r.end_date).slice(0, 10)}
                 </td>
                 <td>{r.pay_date ? String(r.pay_date).slice(0, 10) : '—'}</td>
-                <td>{r.pay_frequency_name}</td>
+                <td>{freqLabel[r.pay_frequency_name] || r.pay_frequency_name}</td>
                 <td>
                   <span className={`badge ${r.status === 'DRAFT' ? 'draft' : 'finalized'}`}>
-                    {r.status}
+                    {statusLabel[r.status] || r.status}
                   </span>
                 </td>
                 <td>{r.notes}</td>
                 <td>
                   <div className="actions">
                     <button type="button" className="secondary" onClick={() => startEdit(r)}>
-                      Edit
+                      Editar
                     </button>
                     <button
                       type="button"
@@ -209,7 +216,7 @@ export default function Payrolls() {
                       onClick={() => remove(r.payroll_id)}
                       disabled={r.status !== 'DRAFT'}
                     >
-                      Delete
+                      Eliminar
                     </button>
                   </div>
                 </td>

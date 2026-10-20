@@ -2,12 +2,12 @@ import { NavLink, Outlet } from 'react-router-dom';
 import { useAuth } from '../AuthContext';
 
 const links = [
-  { to: '/', label: 'Dashboard', end: true },
-  { to: '/departments', label: 'Departments' },
-  { to: '/employees', label: 'Employees' },
-  { to: '/concepts', label: 'Concepts' },
-  { to: '/payrolls', label: 'Payrolls' },
-  { to: '/loans', label: 'Loans' }
+  { to: '/', label: 'Inicio', end: true },
+  { to: '/departments', label: 'Departamentos' },
+  { to: '/employees', label: 'Empleados' },
+  { to: '/concepts', label: 'Conceptos' },
+  { to: '/payrolls', label: 'Nóminas' },
+  { to: '/loans', label: 'Préstamos' }
 ];
 
 export default function Layout() {
@@ -16,7 +16,7 @@ export default function Layout() {
   return (
     <div className="layout">
       <aside className="sidebar">
-        <div className="brand">PayRoll</div>
+        <div className="brand">Nómina</div>
         {links.map((l) => (
           <NavLink
             key={l.to}
@@ -34,7 +34,7 @@ export default function Layout() {
             {user?.first_name || user?.user_na || user?.email}
           </div>
           <button type="button" className="secondary" onClick={logout}>
-            Logout
+            Cerrar sesión
           </button>
         </div>
       </aside>

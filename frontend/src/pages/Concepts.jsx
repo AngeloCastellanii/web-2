@@ -10,6 +10,21 @@ const empty = {
   calc_value: ''
 };
 
+const effectLabel = { CREDIT: 'Acredita (+)', DEBIT: 'Debita (−)' };
+const categoryLabel = {
+  BASE_SALARY: 'Salario base',
+  OVERTIME: 'Hora extra',
+  BONUS: 'Bono',
+  LEGAL_DEDUCTION: 'Descuento de ley',
+  OPTIONAL: 'Opcional',
+  LOAN: 'Préstamo'
+};
+const calcLabel = {
+  PERCENT_SALARY: 'Porcentaje del salario',
+  FIXED_AMOUNT: 'Monto fijo',
+  MANUAL: 'Manual'
+};
+
 export default function Concepts() {
   const [rows, setRows] = useState([]);
   const [form, setForm] = useState(empty);
@@ -76,12 +91,12 @@ export default function Concepts() {
   return (
     <div>
       <div className="page-header">
-        <h2>Concepts</h2>
+        <h2>Conceptos</h2>
       </div>
       <div className="panel">
         <form onSubmit={onSubmit} className="form-grid">
           <div className="field">
-            <label>Name</label>
+            <label>Nombre</label>
             <input
               value={form.name}
               onChange={(e) => setField('name', e.target.value)}
@@ -89,39 +104,39 @@ export default function Concepts() {
             />
           </div>
           <div className="field">
-            <label>Effect</label>
+            <label>Efecto</label>
             <select value={form.effect} onChange={(e) => setField('effect', e.target.value)}>
-              <option value="CREDIT">CREDIT (+)</option>
-              <option value="DEBIT">DEBIT (−)</option>
+              <option value="CREDIT">Acredita (+)</option>
+              <option value="DEBIT">Debita (−)</option>
             </select>
           </div>
           <div className="field">
-            <label>Category</label>
+            <label>Categoría</label>
             <select
               value={form.category}
               onChange={(e) => setField('category', e.target.value)}
             >
-              <option value="BASE_SALARY">BASE_SALARY</option>
-              <option value="OVERTIME">OVERTIME</option>
-              <option value="BONUS">BONUS</option>
-              <option value="LEGAL_DEDUCTION">LEGAL_DEDUCTION</option>
-              <option value="OPTIONAL">OPTIONAL</option>
-              <option value="LOAN">LOAN</option>
+              <option value="BASE_SALARY">Salario base</option>
+              <option value="OVERTIME">Hora extra</option>
+              <option value="BONUS">Bono</option>
+              <option value="LEGAL_DEDUCTION">Descuento de ley</option>
+              <option value="OPTIONAL">Opcional</option>
+              <option value="LOAN">Préstamo</option>
             </select>
           </div>
           <div className="field">
-            <label>Calc type</label>
+            <label>Tipo de cálculo</label>
             <select
               value={form.calc_type}
               onChange={(e) => setField('calc_type', e.target.value)}
             >
-              <option value="PERCENT_SALARY">PERCENT_SALARY</option>
-              <option value="FIXED_AMOUNT">FIXED_AMOUNT</option>
-              <option value="MANUAL">MANUAL</option>
+              <option value="PERCENT_SALARY">Porcentaje del salario</option>
+              <option value="FIXED_AMOUNT">Monto fijo</option>
+              <option value="MANUAL">Manual</option>
             </select>
           </div>
           <div className="field">
-            <label>Calc value</label>
+            <label>Valor de cálculo</label>
             <input
               type="number"
               step="0.0001"
@@ -130,18 +145,18 @@ export default function Concepts() {
             />
           </div>
           <div className="field">
-            <label>Automatic</label>
+            <label>Automático</label>
             <select
               value={String(form.is_automatic)}
               onChange={(e) => setField('is_automatic', e.target.value === 'true')}
             >
               <option value="false">No</option>
-              <option value="true">Yes</option>
+              <option value="true">Sí</option>
             </select>
           </div>
           <div className="field" style={{ alignSelf: 'end' }}>
             <div className="actions">
-              <button type="submit">{editId ? 'Update' : 'Create'}</button>
+              <button type="submit">{editId ? 'Actualizar' : 'Crear'}</button>
               {editId && (
                 <button
                   type="button"
@@ -151,7 +166,7 @@ export default function Concepts() {
                     setForm(empty);
                   }}
                 >
-                  Cancel
+                  Cancelar
                 </button>
               )}
             </div>
@@ -164,11 +179,11 @@ export default function Concepts() {
           <thead>
             <tr>
               <th>ID</th>
-              <th>Name</th>
-              <th>Effect</th>
-              <th>Category</th>
-              <th>Calc</th>
-              <th>Active</th>
+              <th>Nombre</th>
+              <th>Efecto</th>
+              <th>Categoría</th>
+              <th>Cálculo</th>
+              <th>Activo</th>
               <th />
             </tr>
           </thead>
@@ -177,23 +192,23 @@ export default function Concepts() {
               <tr key={r.concept_id}>
                 <td>{r.concept_id}</td>
                 <td>{r.name}</td>
-                <td>{r.effect}</td>
-                <td>{r.category}</td>
+                <td>{effectLabel[r.effect] || r.effect}</td>
+                <td>{categoryLabel[r.category] || r.category}</td>
                 <td>
-                  {r.calc_type} {r.calc_value ?? ''}
+                  {calcLabel[r.calc_type] || r.calc_type} {r.calc_value ?? ''}
                 </td>
-                <td>{r.is_active ? 'Yes' : 'No'}</td>
+                <td>{r.is_active ? 'Sí' : 'No'}</td>
                 <td>
                   <div className="actions">
                     <button type="button" className="secondary" onClick={() => startEdit(r)}>
-                      Edit
+                      Editar
                     </button>
                     <button
                       type="button"
                       className="danger"
                       onClick={() => remove(r.concept_id)}
                     >
-                      Deactivate
+                      Desactivar
                     </button>
                   </div>
                 </td>

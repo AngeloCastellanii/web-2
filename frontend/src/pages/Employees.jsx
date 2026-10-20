@@ -14,6 +14,8 @@ const empty = {
   position_id: ''
 };
 
+const modalityLabel = { FIXED: 'Salario fijo', HOURLY: 'Por hora' };
+
 export default function Employees() {
   const [rows, setRows] = useState([]);
   const [persons, setPersons] = useState([]);
@@ -21,7 +23,7 @@ export default function Employees() {
   const [positions, setPositions] = useState([]);
   const [freqs, setFreqs] = useState([]);
   const [form, setForm] = useState(empty);
-  const [mode, setMode] = useState('new-person'); // new-person | existing-person
+  const [mode, setMode] = useState('new-person');
   const [editId, setEditId] = useState(null);
   const [msg, setMsg] = useState('');
 
@@ -81,7 +83,7 @@ export default function Employees() {
         null
       ]);
       if (pr.err || !pr.data) {
-        setMsg(pr.msg || 'Error creating person');
+        setMsg(pr.msg || 'Error al crear la persona');
         return;
       }
       personId = pr.data.person_id;
@@ -124,19 +126,25 @@ export default function Employees() {
     load();
   }
 
+  const freqLabel = {
+    WEEKLY: 'Semanal',
+    BIWEEKLY: 'Quincenal',
+    MONTHLY: 'Mensual'
+  };
+
   return (
     <div>
       <div className="page-header">
-        <h2>Employees</h2>
+        <h2>Empleados</h2>
       </div>
       <div className="panel">
         <form onSubmit={onSubmit}>
           {!editId && (
             <div className="field">
-              <label>Person source</label>
+              <label>Origen de la persona</label>
               <select value={mode} onChange={(e) => setMode(e.target.value)}>
-                <option value="new-person">Create new person</option>
-                <option value="existing-person">Use existing person</option>
+                <option value="new-person">Crear persona nueva</option>
+                <option value="existing-person">Usar persona existente</option>
               </select>
             </div>
           )}
@@ -144,7 +152,7 @@ export default function Employees() {
             {!editId && mode === 'new-person' && (
               <>
                 <div className="field">
-                  <label>First name</label>
+                  <label>Nombre</label>
                   <input
                     value={form.first_name}
                     onChange={(e) => setField('first_name', e.target.value)}
@@ -152,7 +160,7 @@ export default function Employees() {
                   />
                 </div>
                 <div className="field">
-                  <label>Last name</label>
+                  <label>Apellido</label>
                   <input
                     value={form.last_name}
                     onChange={(e) => setField('last_name', e.target.value)}
@@ -160,7 +168,7 @@ export default function Employees() {
                   />
                 </div>
                 <div className="field">
-                  <label>National ID</label>
+                  <label>Cédula</label>
                   <input
                     value={form.national_id}
                     onChange={(e) => setField('national_id', e.target.value)}
@@ -171,13 +179,13 @@ export default function Employees() {
             )}
             {!editId && mode === 'existing-person' && (
               <div className="field">
-                <label>Person</label>
+                <label>Persona</label>
                 <select
                   value={form.person_id}
                   onChange={(e) => setField('person_id', e.target.value)}
                   required
                 >
-                  <option value="">Select…</option>
+                  <option value="">Seleccionar…</option>
                   {persons.map((p) => (
                     <option key={p.person_id} value={p.person_id}>
                       {p.first_name} {p.last_name} ({p.national_id})
@@ -187,7 +195,7 @@ export default function Employees() {
               </div>
             )}
             <div className="field">
-              <label>Hire date</label>
+              <label>Fecha de ingreso</label>
               <input
                 type="date"
                 value={form.hire_date}
@@ -196,17 +204,17 @@ export default function Employees() {
               />
             </div>
             <div className="field">
-              <label>Pay modality</label>
+              <label>Modalidad de pago</label>
               <select
                 value={form.pay_modality}
                 onChange={(e) => setField('pay_modality', e.target.value)}
               >
-                <option value="FIXED">FIXED</option>
-                <option value="HOURLY">HOURLY</option>
+                <option value="FIXED">Salario fijo</option>
+                <option value="HOURLY">Por hora</option>
               </select>
             </div>
             <div className="field">
-              <label>Base salary / rate</label>
+              <label>Salario base / tarifa</label>
               <input
                 type="number"
                 step="0.01"
@@ -216,28 +224,28 @@ export default function Employees() {
               />
             </div>
             <div className="field">
-              <label>Pay frequency</label>
+              <label>Periodicidad</label>
               <select
                 value={form.pay_frequency_id}
                 onChange={(e) => setField('pay_frequency_id', e.target.value)}
                 required
               >
-                <option value="">Select…</option>
+                <option value="">Seleccionar…</option>
                 {freqs.map((f) => (
                   <option key={f.pay_frequency_id} value={f.pay_frequency_id}>
-                    {f.name}
+                    {freqLabel[f.name] || f.name}
                   </option>
                 ))}
               </select>
             </div>
             <div className="field">
-              <label>Department</label>
+              <label>Departamento</label>
               <select
                 value={form.department_id}
                 onChange={(e) => setField('department_id', e.target.value)}
                 required
               >
-                <option value="">Select…</option>
+                <option value="">Seleccionar…</option>
                 {departments.map((d) => (
                   <option key={d.department_id} value={d.department_id}>
                     {d.name}
@@ -246,13 +254,13 @@ export default function Employees() {
               </select>
             </div>
             <div className="field">
-              <label>Position</label>
+              <label>Cargo</label>
               <select
                 value={form.position_id}
                 onChange={(e) => setField('position_id', e.target.value)}
                 required
               >
-                <option value="">Select…</option>
+                <option value="">Seleccionar…</option>
                 {positions.map((p) => (
                   <option key={p.position_id} value={p.position_id}>
                     {p.name}
@@ -262,7 +270,7 @@ export default function Employees() {
             </div>
           </div>
           <div className="actions" style={{ marginTop: '0.75rem' }}>
-            <button type="submit">{editId ? 'Update' : 'Create'}</button>
+            <button type="submit">{editId ? 'Actualizar' : 'Crear'}</button>
             {editId && (
               <button
                 type="button"
@@ -272,7 +280,7 @@ export default function Employees() {
                   setForm(empty);
                 }}
               >
-                Cancel
+                Cancelar
               </button>
             )}
           </div>
@@ -284,12 +292,12 @@ export default function Employees() {
           <thead>
             <tr>
               <th>ID</th>
-              <th>Name</th>
-              <th>Modality</th>
-              <th>Salary</th>
-              <th>Dept</th>
-              <th>Position</th>
-              <th>Active</th>
+              <th>Nombre</th>
+              <th>Modalidad</th>
+              <th>Salario</th>
+              <th>Depto.</th>
+              <th>Cargo</th>
+              <th>Activo</th>
               <th />
             </tr>
           </thead>
@@ -300,22 +308,22 @@ export default function Employees() {
                 <td>
                   {r.first_name} {r.last_name}
                 </td>
-                <td>{r.pay_modality}</td>
+                <td>{modalityLabel[r.pay_modality] || r.pay_modality}</td>
                 <td>{r.base_salary}</td>
                 <td>{r.department_name}</td>
                 <td>{r.position_name}</td>
-                <td>{r.is_active ? 'Yes' : 'No'}</td>
+                <td>{r.is_active ? 'Sí' : 'No'}</td>
                 <td>
                   <div className="actions">
                     <button type="button" className="secondary" onClick={() => startEdit(r)}>
-                      Edit
+                      Editar
                     </button>
                     <button
                       type="button"
                       className="danger"
                       onClick={() => remove(r.employee_id)}
                     >
-                      Deactivate
+                      Desactivar
                     </button>
                   </div>
                 </td>

@@ -10,6 +10,8 @@ const empty = {
   status: 'ACTIVE'
 };
 
+const statusLabel = { ACTIVE: 'Activo', PAID: 'Pagado' };
+
 export default function Loans() {
   const [rows, setRows] = useState([]);
   const [employees, setEmployees] = useState([]);
@@ -88,19 +90,19 @@ export default function Loans() {
   return (
     <div>
       <div className="page-header">
-        <h2>Loans</h2>
+        <h2>Préstamos</h2>
       </div>
       <div className="panel">
         <form onSubmit={onSubmit} className="form-grid">
           {!editId && (
             <div className="field">
-              <label>Employee</label>
+              <label>Empleado</label>
               <select
                 value={form.employee_id}
                 onChange={(e) => setField('employee_id', e.target.value)}
                 required
               >
-                <option value="">Select…</option>
+                <option value="">Seleccionar…</option>
                 {employees.map((emp) => (
                   <option key={emp.employee_id} value={emp.employee_id}>
                     {emp.first_name} {emp.last_name}
@@ -111,7 +113,7 @@ export default function Loans() {
           )}
           {!editId && (
             <div className="field">
-              <label>Total amount</label>
+              <label>Monto total</label>
               <input
                 type="number"
                 step="0.01"
@@ -122,7 +124,7 @@ export default function Loans() {
             </div>
           )}
           <div className="field">
-            <label>Remaining balance</label>
+            <label>Saldo pendiente</label>
             <input
               type="number"
               step="0.01"
@@ -132,7 +134,7 @@ export default function Loans() {
             />
           </div>
           <div className="field">
-            <label>Installment</label>
+            <label>Cuota</label>
             <input
               type="number"
               step="0.01"
@@ -143,7 +145,7 @@ export default function Loans() {
           </div>
           {!editId && (
             <div className="field">
-              <label>Start date</label>
+              <label>Fecha de inicio</label>
               <input
                 type="date"
                 value={form.start_date}
@@ -154,16 +156,16 @@ export default function Loans() {
           )}
           {editId && (
             <div className="field">
-              <label>Status</label>
+              <label>Estado</label>
               <select value={form.status} onChange={(e) => setField('status', e.target.value)}>
-                <option value="ACTIVE">ACTIVE</option>
-                <option value="PAID">PAID</option>
+                <option value="ACTIVE">Activo</option>
+                <option value="PAID">Pagado</option>
               </select>
             </div>
           )}
           <div className="field" style={{ alignSelf: 'end' }}>
             <div className="actions">
-              <button type="submit">{editId ? 'Update' : 'Create'}</button>
+              <button type="submit">{editId ? 'Actualizar' : 'Crear'}</button>
               {editId && (
                 <button
                   type="button"
@@ -173,7 +175,7 @@ export default function Loans() {
                     setForm(empty);
                   }}
                 >
-                  Cancel
+                  Cancelar
                 </button>
               )}
             </div>
@@ -186,11 +188,11 @@ export default function Loans() {
           <thead>
             <tr>
               <th>ID</th>
-              <th>Employee</th>
+              <th>Empleado</th>
               <th>Total</th>
-              <th>Balance</th>
-              <th>Installment</th>
-              <th>Status</th>
+              <th>Saldo</th>
+              <th>Cuota</th>
+              <th>Estado</th>
               <th />
             </tr>
           </thead>
@@ -204,14 +206,14 @@ export default function Loans() {
                 <td>{r.total_amount}</td>
                 <td>{r.remaining_balance}</td>
                 <td>{r.installment}</td>
-                <td>{r.status}</td>
+                <td>{statusLabel[r.status] || r.status}</td>
                 <td>
                   <div className="actions">
                     <button type="button" className="secondary" onClick={() => startEdit(r)}>
-                      Edit
+                      Editar
                     </button>
                     <button type="button" className="danger" onClick={() => remove(r.loan_id)}>
-                      Close
+                      Cerrar
                     </button>
                   </div>
                 </td>

@@ -51,16 +51,16 @@ export default function Departments() {
   return (
     <div>
       <div className="page-header">
-        <h2>Departments</h2>
+        <h2>Departamentos</h2>
       </div>
       <div className="panel">
         <form onSubmit={onSubmit} className="form-grid">
           <div className="field">
-            <label>Name</label>
+            <label>Nombre</label>
             <input value={name} onChange={(e) => setName(e.target.value)} required />
           </div>
           <div className="field">
-            <label>Description</label>
+            <label>Descripción</label>
             <input
               value={description}
               onChange={(e) => setDescription(e.target.value)}
@@ -68,7 +68,7 @@ export default function Departments() {
           </div>
           <div className="field" style={{ alignSelf: 'end' }}>
             <div className="actions">
-              <button type="submit">{editId ? 'Update' : 'Create'}</button>
+              <button type="submit">{editId ? 'Actualizar' : 'Crear'}</button>
               {editId && (
                 <button
                   type="button"
@@ -79,7 +79,7 @@ export default function Departments() {
                     setDescription('');
                   }}
                 >
-                  Cancel
+                  Cancelar
                 </button>
               )}
             </div>
@@ -92,9 +92,9 @@ export default function Departments() {
           <thead>
             <tr>
               <th>ID</th>
-              <th>Name</th>
-              <th>Description</th>
-              <th>Active</th>
+              <th>Nombre</th>
+              <th>Descripción</th>
+              <th>Activo</th>
               <th />
             </tr>
           </thead>
@@ -104,14 +104,14 @@ export default function Departments() {
                 <td>{r.department_id}</td>
                 <td>{r.name}</td>
                 <td>{r.description}</td>
-                <td>{r.is_active ? 'Yes' : 'No'}</td>
+                <td>{r.is_active ? 'Sí' : 'No'}</td>
                 <td>
                   <div className="actions">
                     <button type="button" className="secondary" onClick={() => startEdit(r)}>
-                      Edit
+                      Editar
                     </button>
                     <button type="button" className="danger" onClick={() => remove(r.department_id)}>
-                      Deactivate
+                      Desactivar
                     </button>
                   </div>
                 </td>
