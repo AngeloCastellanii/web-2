@@ -1,48 +1,36 @@
 ﻿const Payroll = class {
-  constructor(obj) {
-    this.obj = obj;
+  constructor(deps) {
+    this.db = deps.db;
+    this.query = deps.query;
   }
 
-  listPayrolls() {
-    db.query(query.Payroll.listPayrolls, []).then((r) => {
-      if (r === false) {
-        this.obj.res.send(JSON.stringify({ msg: 'Error al listar nóminas', err: 'error sql' }));
-        return;
-      }
-      this.obj.res.send(JSON.stringify({ msg: 'ok', data: r }));
-    });
+  async listPayrolls() {
+    const r = await this.db.query(this.query.Payroll.listPayrolls, []);
+    if (r === false) return { msg: 'Error al listar nóminas', err: 'error sql' };
+    return { msg: 'ok', data: r };
   }
 
-  findPayroll(id) {
-    db.query(query.Payroll.findPayroll, [id]).then((r) => {
-      if (r && r.length > 0) {
-        this.obj.res.send(JSON.stringify({ msg: 'ok', data: r[0] }));
-      } else {
-        this.obj.res.send(JSON.stringify({ msg: 'Payroll no encontrado', err: 'no encontrado' }));
-      }
-    });
+  async findPayroll(id) {
+    const r = await this.db.query(this.query.Payroll.findPayroll, [id]);
+    if (r && r.length > 0) return { msg: 'ok', data: r[0] };
+    return { msg: 'Payroll no encontrado', err: 'no encontrado' };
   }
 
-  insertPayroll(startDate, endDate, payDate, status, payFrequencyId, notes) {
-    const st = status || 'DRAFT';
-    db.query(query.Payroll.insertPayroll, [
+  async insertPayroll(startDate, endDate, payDate, status, payFrequencyId, notes) {
+    const r = await this.db.query(this.query.Payroll.insertPayroll, [
       startDate,
       endDate,
       payDate || null,
-      st,
+      status || 'DRAFT',
       payFrequencyId,
       notes || null
-    ]).then((r) => {
-      if (r && r.length > 0) {
-        this.obj.res.send(JSON.stringify({ msg: 'Nómina creada', data: r[0] }));
-      } else {
-        this.obj.res.send(JSON.stringify({ msg: 'Error al crear nómina', err: 'error sql' }));
-      }
-    });
+    ]);
+    if (r && r.length > 0) return { msg: 'Nómina creada', data: r[0] };
+    return { msg: 'Error al crear nómina', err: 'error sql' };
   }
 
-  updatePayroll(id, startDate, endDate, payDate, status, payFrequencyId, notes) {
-    db.query(query.Payroll.updatePayroll, [
+  async updatePayroll(id, startDate, endDate, payDate, status, payFrequencyId, notes) {
+    const r = await this.db.query(this.query.Payroll.updatePayroll, [
       id,
       startDate,
       endDate,
@@ -50,33 +38,21 @@
       status || 'DRAFT',
       payFrequencyId,
       notes || null
-    ]).then((r) => {
-      if (r && r.length > 0) {
-        this.obj.res.send(JSON.stringify({ msg: 'Nómina actualizada', data: r[0] }));
-      } else {
-        this.obj.res.send(
-          JSON.stringify({
-            msg: 'Error al actualizar nómina (solo borrador se puede editar)',
-            err: 'error sql'
-          })
-        );
-      }
-    });
+    ]);
+    if (r && r.length > 0) return { msg: 'Nómina actualizada', data: r[0] };
+    return {
+      msg: 'Error al actualizar nómina (solo borrador se puede editar)',
+      err: 'error sql'
+    };
   }
 
-  deletePayroll(id) {
-    db.query(query.Payroll.deletePayroll, [id]).then((r) => {
-      if (r && r.length > 0) {
-        this.obj.res.send(JSON.stringify({ msg: 'Nómina eliminada', data: r[0] }));
-      } else {
-        this.obj.res.send(
-          JSON.stringify({
-            msg: 'Error al eliminar nómina (solo borrador se puede eliminar)',
-            err: 'error sql'
-          })
-        );
-      }
-    });
+  async deletePayroll(id) {
+    const r = await this.db.query(this.query.Payroll.deletePayroll, [id]);
+    if (r && r.length > 0) return { msg: 'Nómina eliminada', data: r[0] };
+    return {
+      msg: 'Error al eliminar nómina (solo borrador se puede eliminar)',
+      err: 'error sql'
+    };
   }
 };
 

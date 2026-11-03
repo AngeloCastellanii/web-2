@@ -1,26 +1,19 @@
 ﻿const PayFrequency = class {
-  constructor(obj) {
-    this.obj = obj;
+  constructor(deps) {
+    this.db = deps.db;
+    this.query = deps.query;
   }
 
-  listPayFrequencies() {
-    db.query(query.PayFrequency.listPayFrequencies, []).then((r) => {
-      if (r === false) {
-        this.obj.res.send(JSON.stringify({ msg: 'Error al listar periodicidades', err: 'error sql' }));
-        return;
-      }
-      this.obj.res.send(JSON.stringify({ msg: 'ok', data: r }));
-    });
+  async listPayFrequencies() {
+    const r = await this.db.query(this.query.PayFrequency.listPayFrequencies, []);
+    if (r === false) return { msg: 'Error al listar periodicidades', err: 'error sql' };
+    return { msg: 'ok', data: r };
   }
 
-  findPayFrequency(id) {
-    db.query(query.PayFrequency.findPayFrequency, [id]).then((r) => {
-      if (r && r.length > 0) {
-        this.obj.res.send(JSON.stringify({ msg: 'ok', data: r[0] }));
-      } else {
-        this.obj.res.send(JSON.stringify({ msg: 'Pay frequency no encontrado', err: 'no encontrado' }));
-      }
-    });
+  async findPayFrequency(id) {
+    const r = await this.db.query(this.query.PayFrequency.findPayFrequency, [id]);
+    if (r && r.length > 0) return { msg: 'ok', data: r[0] };
+    return { msg: 'Pay frequency no encontrado', err: 'no encontrado' };
   }
 };
 

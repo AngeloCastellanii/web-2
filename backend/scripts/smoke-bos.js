@@ -32,7 +32,7 @@ let ok = true;
 for (const name of bos) {
   try {
     const C = require(path.join(__dirname, '..', 'BO', name));
-    const instance = new C({ res: { send: () => {} }, params: [] });
+    const instance = new C({ db: global.db, query: global.query });
     const methods = Object.getOwnPropertyNames(Object.getPrototypeOf(instance)).filter(
       (m) => m !== 'constructor'
     );

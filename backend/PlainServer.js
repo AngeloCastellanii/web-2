@@ -64,12 +64,7 @@ app.get('/', (req, res) => {
   res.send(JSON.stringify({ msg: 'API de nómina activa', status: 'ok' }));
 });
 
-/**
- * Único punto de entrada de negocio.
- * El servidor no conoce BOs:
- * sesión -> permiso (Map) -> ValidationMap -> Reflex.execute
- */
-app.post('/proccess', (req, res) => {
+app.post('/proccess', async (req, res) => {
   if (!sess.sessionExist(req)) {
     res.end(JSON.stringify({ msg: 'Debe iniciar sesión primero' }));
     return;
@@ -80,11 +75,13 @@ app.post('/proccess', (req, res) => {
     method_de: req.body.method_de,
     profile_id: req.session.sessionObj.profile_id,
     params: req.body.params || [],
+    db,
+    query,
     req,
     res
   };
 
-  sec.exeMethod(ctx);
+  await sec.exeMethod(ctx);
 });
 
 app.post('/login', (req, res) => {

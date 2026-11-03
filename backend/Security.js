@@ -44,7 +44,7 @@ const Security = class {
    * Flujo desacoplado:
    * permiso (Map) -> ValidationMap -> Reflex.execute
    */
-  exeMethod(obj) {
+  async exeMethod(obj) {
     if (!this.getPermission(obj)) {
       obj.res.send(JSON.stringify({ msg: 'Acceso denegado' }));
       return;
@@ -56,7 +56,7 @@ const Security = class {
       return;
     }
 
-    this.reflex.execute(
+    await this.reflex.execute(
       obj.object_de,
       obj.method_de,
       obj.params || [],

@@ -1,67 +1,48 @@
 ﻿const Person = class {
-  constructor(obj) {
-    this.obj = obj;
+  constructor(deps) {
+    this.db = deps.db;
+    this.query = deps.query;
   }
 
-  listPersons() {
-    db.query(query.Person.listPersons, []).then((r) => {
-      if (r === false) {
-        this.obj.res.send(JSON.stringify({ msg: 'Error al listar personas', err: 'error sql' }));
-        return;
-      }
-      this.obj.res.send(JSON.stringify({ msg: 'ok', data: r }));
-    });
+  async listPersons() {
+    const r = await this.db.query(this.query.Person.listPersons, []);
+    if (r === false) return { msg: 'Error al listar personas', err: 'error sql' };
+    return { msg: 'ok', data: r };
   }
 
-  findPerson(id) {
-    db.query(query.Person.findPerson, [id]).then((r) => {
-      if (r && r.length > 0) {
-        this.obj.res.send(JSON.stringify({ msg: 'ok', data: r[0] }));
-      } else {
-        this.obj.res.send(JSON.stringify({ msg: 'Person no encontrado', err: 'no encontrado' }));
-      }
-    });
+  async findPerson(id) {
+    const r = await this.db.query(this.query.Person.findPerson, [id]);
+    if (r && r.length > 0) return { msg: 'ok', data: r[0] };
+    return { msg: 'Person no encontrado', err: 'no encontrado' };
   }
 
-  insertPerson(firstName, lastName, nationalId, birthDate) {
-    db.query(query.Person.insertPerson, [
+  async insertPerson(firstName, lastName, nationalId, birthDate) {
+    const r = await this.db.query(this.query.Person.insertPerson, [
       firstName,
       lastName,
       nationalId,
       birthDate || null
-    ]).then((r) => {
-      if (r && r.length > 0) {
-        this.obj.res.send(JSON.stringify({ msg: 'Persona creada', data: r[0] }));
-      } else {
-        this.obj.res.send(JSON.stringify({ msg: 'Error al crear persona', err: 'error sql' }));
-      }
-    });
+    ]);
+    if (r && r.length > 0) return { msg: 'Persona creada', data: r[0] };
+    return { msg: 'Error al crear persona', err: 'error sql' };
   }
 
-  updatePerson(id, firstName, lastName, nationalId, birthDate) {
-    db.query(query.Person.updatePerson, [
+  async updatePerson(id, firstName, lastName, nationalId, birthDate) {
+    const r = await this.db.query(this.query.Person.updatePerson, [
       id,
       firstName,
       lastName,
       nationalId,
       birthDate || null
-    ]).then((r) => {
-      if (r && r.length > 0) {
-        this.obj.res.send(JSON.stringify({ msg: 'Persona actualizada', data: r[0] }));
-      } else {
-        this.obj.res.send(JSON.stringify({ msg: 'Error al actualizar persona', err: 'error sql' }));
-      }
-    });
+    ]);
+    if (r && r.length > 0) return { msg: 'Persona actualizada', data: r[0] };
+    return { msg: 'Error al actualizar persona', err: 'error sql' };
   }
 
-  deletePerson(id) {
-    db.query(query.Person.deletePerson, [id]).then((r) => {
-      if (r && r.length > 0) {
-        this.obj.res.send(JSON.stringify({ msg: 'Persona eliminada', data: r[0] }));
-      } else {
-        this.obj.res.send(JSON.stringify({ msg: 'Error al eliminar persona', err: 'error sql' }));
-      }
-    });
+  async deletePerson(id) {
+    const r = await this.db.query(this.query.Person.deletePerson, [id]);
+    if (r && r.length > 0) return { msg: 'Persona eliminada', data: r[0] };
+    return { msg: 'Error al eliminar persona', err: 'error sql' };
   }
 };
 

@@ -46,14 +46,14 @@ const Reflex = class {
    * Ejecuta método por reflexión:
    * object_de = nombre de clase, method_de = nombre de método, params = argumentos
    */
-  execute(object_de, method_de, params, ctx) {
+  async execute(object_de, method_de, params, ctx) {
     if (!this.classMap.has(object_de)) {
       ctx.res.send(JSON.stringify({ msg: 'Objeto no registrado', err: object_de }));
       return false;
     }
 
     const ClassRef = this.classMap.get(object_de);
-    const instance = new ClassRef(ctx);
+    const instance = new ClassRef({ db: ctx.db, query: ctx.query });
     const method = instance[method_de];
 
     if (typeof method !== 'function') {
@@ -62,7 +62,8 @@ const Reflex = class {
     }
 
     try {
-      method.apply(instance, params || []);
+      const result = await method.apply(instance, params || []);
+      ctx.res.send(JSON.stringify(result));
       return true;
     } catch (ex) {
       log.error(ex.message || ex);
