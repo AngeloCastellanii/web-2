@@ -92,9 +92,6 @@ GRANT SELECT, INSERT, UPDATE, DELETE ON
   employee,
   concept,
   payroll,
-  payroll_entry,
-  payroll_detail,
-  payment,
   loan,
   pay_frequency
 TO payroll_hr;
@@ -114,9 +111,6 @@ GRANT USAGE, SELECT ON SEQUENCE
   employee_employee_id_seq,
   concept_concept_id_seq,
   payroll_payroll_id_seq,
-  payroll_entry_payroll_entry_id_seq,
-  payroll_detail_payroll_detail_id_seq,
-  payment_payment_id_seq,
   loan_loan_id_seq,
   pay_frequency_pay_frequency_id_seq
 TO payroll_hr;

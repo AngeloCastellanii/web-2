@@ -48,9 +48,6 @@ INSERT INTO object (object_de) VALUES
   ('Employee'),
   ('Concept'),
   ('Payroll'),
-  ('PayrollEntry'),
-  ('PayrollDetail'),
-  ('Payment'),
   ('Loan'),
   ('Profile'),
   ('Permission');
@@ -74,7 +71,7 @@ SELECT object_id, m FROM object, (VALUES
 
 INSERT INTO method (object_id, method_de)
 SELECT object_id, m FROM object, (VALUES
-  ('listPersons'), ('findPerson'), ('findPersonByNationalId'), ('insertPerson'), ('updatePerson'), ('deletePerson')
+  ('listPersons'), ('findPerson'), ('insertPerson'), ('updatePerson'), ('deletePerson')
 ) AS t(m) WHERE object_de = 'Person';
 
 INSERT INTO method (object_id, method_de)
@@ -91,21 +88,6 @@ INSERT INTO method (object_id, method_de)
 SELECT object_id, m FROM object, (VALUES
   ('listPayrolls'), ('findPayroll'), ('insertPayroll'), ('updatePayroll'), ('deletePayroll')
 ) AS t(m) WHERE object_de = 'Payroll';
-
-INSERT INTO method (object_id, method_de)
-SELECT object_id, m FROM object, (VALUES
-  ('listPayrollEntries'), ('findPayrollEntry'), ('insertPayrollEntry'), ('deletePayrollEntry')
-) AS t(m) WHERE object_de = 'PayrollEntry';
-
-INSERT INTO method (object_id, method_de)
-SELECT object_id, m FROM object, (VALUES
-  ('listPayrollDetails'), ('insertPayrollDetail'), ('deletePayrollDetail')
-) AS t(m) WHERE object_de = 'PayrollDetail';
-
-INSERT INTO method (object_id, method_de)
-SELECT object_id, m FROM object, (VALUES
-  ('listPayments'), ('findPayment'), ('insertPayment')
-) AS t(m) WHERE object_de = 'Payment';
 
 INSERT INTO method (object_id, method_de)
 SELECT object_id, m FROM object, (VALUES

@@ -30,15 +30,6 @@ const Person = class {
     return { msg: 'ok', data: r[0] };
   }
 
-  async findPersonByNationalId(nationalId) {
-    const err = missing(nationalId, 'cedula');
-    if (err) return err;
-    const r = await this.db.query(this.query.Person.findPersonByNationalId, [nationalId]);
-    if (r === false) return { msg: 'Error al buscar persona', err: 'error sql' };
-    if (!r.length) return { msg: 'Persona no encontrada', err: 'no encontrado' };
-    return { msg: 'ok', data: r[0] };
-  }
-
   async insertPerson(firstName, lastName, nationalId, birthDate) {
     const err = missing(firstName, 'nombre') || missing(lastName, 'apellido') || missing(nationalId, 'cedula');
     if (err) return err;

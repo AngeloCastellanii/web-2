@@ -25,9 +25,6 @@ const bos = [
   'Employee',
   'Concept',
   'Payroll',
-  'PayrollEntry',
-  'PayrollDetail',
-  'Payment',
   'Loan',
   'Profile',
   'Permission'
