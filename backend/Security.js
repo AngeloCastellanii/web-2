@@ -22,22 +22,20 @@ const Security = class {
       objPermission.object_de + '_' + objPermission.method_de + '_' + objPermission.profile_id;
     return this.permissionMethod.has(key) ? this.permissionMethod.get(key) : false;
   }
-
   async exeMethod(obj) {
     if (!this.getPermission(obj)) {
       obj.res.json({ msg: 'Acceso denegado' });
       return;
     }
 
-    if (!/^[A-Za-z]+$/.test(obj.object_de || '')) {
-      obj.res.json({ msg: 'Objeto no válido' });
+    const check = valid.validate(obj.object_de, obj.method_de, obj.params || []);
+    if (!check.ok) {
+      obj.res.json({ msg: check.msg, err: 'validation' });
       return;
     }
 
-    let ClassRef;
-    try {
-      ClassRef = require(`./BO/${obj.object_de}`);
-    } catch (ex) {
+    const ClassRef = reflex.getClass(obj.object_de);
+    if (!ClassRef) {
       obj.res.json({ msg: 'Objeto no registrado', err: obj.object_de });
       return;
     }
@@ -48,7 +46,6 @@ const Security = class {
       obj.res.json({ msg: 'Método no encontrado', err: obj.method_de });
       return;
     }
-
     try {
       const result = await method.apply(instance, obj.params || []);
       obj.res.json(result);

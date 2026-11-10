@@ -1,17 +1,4 @@
-﻿function isEmpty(value) {
-  if (value === null || value === undefined) return true;
-  if (String(value).trim() === '') return true;
-  return false;
-}
-
-function missing(value, label) {
-  if (isEmpty(value) && value !== 0 && value !== false) {
-    return { msg: `El campo ${label} es obligatorio`, err: 'validation' };
-  }
-  return null;
-}
-
-const Person = class {
+﻿const Person = class {
   constructor(deps) {
     this.db = deps.db;
     this.query = deps.query;
@@ -31,8 +18,6 @@ const Person = class {
   }
 
   async insertPerson(firstName, lastName, nationalId, birthDate) {
-    const err = missing(firstName, 'nombre') || missing(lastName, 'apellido') || missing(nationalId, 'cedula');
-    if (err) return err;
     const r = await this.db.query(this.query.Person.insertPerson, [
       firstName,
       lastName,
@@ -45,12 +30,6 @@ const Person = class {
   }
 
   async updatePerson(id, firstName, lastName, nationalId, birthDate) {
-    const err =
-      missing(id, 'id') ||
-      missing(firstName, 'nombre') ||
-      missing(lastName, 'apellido') ||
-      missing(nationalId, 'cedula');
-    if (err) return err;
     const r = await this.db.query(this.query.Person.updatePerson, [
       id,
       firstName,
@@ -64,8 +43,6 @@ const Person = class {
   }
 
   async deletePerson(id) {
-    const err = missing(id, 'id');
-    if (err) return err;
     const r = await this.db.query(this.query.Person.deletePerson, [id]);
     if (r === false) return { msg: 'Error al eliminar persona', err: 'error sql' };
     if (!r.length) return { msg: 'Persona no encontrada', err: 'no encontrado' };

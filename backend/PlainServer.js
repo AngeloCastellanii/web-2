@@ -6,6 +6,8 @@ const fs = require('fs');
 const DBComponent = require('./DBComponent');
 const Session = require('./Session');
 const Security = require('./Security');
+const Reflex = require('./Reflex');
+const Valid = require('./Validate');
 const Logger = require('./Log');
 
 function deepMerge(base, overlay) {
@@ -38,6 +40,8 @@ if (process.env.PGHOST) config.db.host = process.env.PGHOST;
 global.query = JSON.parse(fs.readFileSync(path.join(__dirname, 'Querys.json'), 'utf8'));
 global.db = new DBComponent();
 global.log = new Logger(fs);
+global.valid = new Valid();
+global.reflex = new Reflex();
 
 const app = express();
 

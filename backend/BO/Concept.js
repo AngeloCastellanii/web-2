@@ -1,17 +1,4 @@
-﻿function isEmpty(value) {
-  if (value === null || value === undefined) return true;
-  if (String(value).trim() === '') return true;
-  return false;
-}
-
-function missing(value, label) {
-  if (isEmpty(value) && value !== 0 && value !== false) {
-    return { msg: `El campo ${label} es obligatorio`, err: 'validation' };
-  }
-  return null;
-}
-
-const Concept = class {
+﻿const Concept = class {
   constructor(deps) {
     this.db = deps.db;
     this.query = deps.query;
@@ -31,11 +18,6 @@ const Concept = class {
   }
 
   async insertConcept(name, effect, category, isAutomatic, calcType, calcValue) {
-    const err = missing(name, 'nombre') || missing(effect, 'efecto') || missing(category, 'categoria');
-    if (err) return err;
-    if (effect !== 'CREDIT' && effect !== 'DEBIT') {
-      return { msg: 'El efecto debe ser CREDIT o DEBIT', err: 'validation' };
-    }
     const r = await this.db.query(this.query.Concept.insertConcept, [
       name,
       effect,
@@ -50,15 +32,6 @@ const Concept = class {
   }
 
   async updateConcept(id, name, effect, category, isAutomatic, calcType, calcValue) {
-    const err =
-      missing(id, 'id') ||
-      missing(name, 'nombre') ||
-      missing(effect, 'efecto') ||
-      missing(category, 'categoria');
-    if (err) return err;
-    if (effect !== 'CREDIT' && effect !== 'DEBIT') {
-      return { msg: 'El efecto debe ser CREDIT o DEBIT', err: 'validation' };
-    }
     const r = await this.db.query(this.query.Concept.updateConcept, [
       id,
       name,
@@ -74,8 +47,6 @@ const Concept = class {
   }
 
   async deleteConcept(id) {
-    const err = missing(id, 'id');
-    if (err) return err;
     const r = await this.db.query(this.query.Concept.deleteConcept, [id]);
     if (r === false) return { msg: 'Error al eliminar concepto', err: 'error sql' };
     if (!r.length) return { msg: 'Concepto no encontrado', err: 'no encontrado' };

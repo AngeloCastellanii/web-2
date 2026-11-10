@@ -1,17 +1,4 @@
-﻿function isEmpty(value) {
-  if (value === null || value === undefined) return true;
-  if (String(value).trim() === '') return true;
-  return false;
-}
-
-function missing(value, label) {
-  if (isEmpty(value) && value !== 0 && value !== false) {
-    return { msg: `El campo ${label} es obligatorio`, err: 'validation' };
-  }
-  return null;
-}
-
-const Payroll = class {
+﻿const Payroll = class {
   constructor(deps) {
     this.db = deps.db;
     this.query = deps.query;
@@ -31,11 +18,6 @@ const Payroll = class {
   }
 
   async insertPayroll(startDate, endDate, payDate, status, payFrequencyId, notes) {
-    const err =
-      missing(startDate, 'fecha_inicio') ||
-      missing(endDate, 'fecha_fin') ||
-      missing(payFrequencyId, 'periodicidad');
-    if (err) return err;
     const r = await this.db.query(this.query.Payroll.insertPayroll, [
       startDate,
       endDate,
@@ -50,12 +32,6 @@ const Payroll = class {
   }
 
   async updatePayroll(id, startDate, endDate, payDate, status, payFrequencyId, notes) {
-    const err =
-      missing(id, 'id') ||
-      missing(startDate, 'fecha_inicio') ||
-      missing(endDate, 'fecha_fin') ||
-      missing(payFrequencyId, 'periodicidad');
-    if (err) return err;
     const r = await this.db.query(this.query.Payroll.updatePayroll, [
       id,
       startDate,
@@ -73,8 +49,6 @@ const Payroll = class {
   }
 
   async deletePayroll(id) {
-    const err = missing(id, 'id');
-    if (err) return err;
     const r = await this.db.query(this.query.Payroll.deletePayroll, [id]);
     if (r === false) return { msg: 'Error al eliminar nómina', err: 'error sql' };
     if (!r.length) {
