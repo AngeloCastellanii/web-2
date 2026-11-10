@@ -6,14 +6,14 @@
     "loadPermissions": "SELECT o.object_de, m.method_de, pr.profile_id FROM permission pe INNER JOIN profile pr ON pr.profile_id = pe.profile_id INNER JOIN method m ON m.method_id = pe.method_id INNER JOIN object o ON o.object_id = m.object_id WHERE m.method_atx = TRUE"
   },
   "Department": {
-    "listDepartments": "SELECT * FROM department ORDER BY department_id",
+    "listDepartments": "SELECT * FROM department WHERE is_active = TRUE ORDER BY department_id",
     "findDepartment": "SELECT * FROM department WHERE department_id = $1",
     "insertDepartment": "INSERT INTO department (name, description) VALUES ($1, $2) RETURNING *",
     "updateDepartment": "UPDATE department SET name = $2, description = $3 WHERE department_id = $1 RETURNING *",
     "deleteDepartment": "UPDATE department SET is_active = FALSE WHERE department_id = $1 RETURNING *"
   },
   "Position": {
-    "listPositions": "SELECT * FROM position ORDER BY position_id",
+    "listPositions": "SELECT * FROM position WHERE is_active = TRUE ORDER BY position_id",
     "findPosition": "SELECT * FROM position WHERE position_id = $1",
     "insertPosition": "INSERT INTO position (name, description) VALUES ($1, $2) RETURNING *",
     "updatePosition": "UPDATE position SET name = $2, description = $3 WHERE position_id = $1 RETURNING *",
@@ -32,14 +32,14 @@
     "deletePerson": "DELETE FROM person WHERE person_id = $1 RETURNING *"
   },
   "Employee": {
-    "listEmployees": "SELECT e.*, p.first_name, p.last_name, p.national_id, d.name AS department_name, pos.name AS position_name, pf.name AS pay_frequency_name FROM employee e INNER JOIN person p ON p.person_id = e.person_id INNER JOIN department d ON d.department_id = e.department_id INNER JOIN position pos ON pos.position_id = e.position_id INNER JOIN pay_frequency pf ON pf.pay_frequency_id = e.pay_frequency_id ORDER BY e.employee_id",
+    "listEmployees": "SELECT e.*, p.first_name, p.last_name, p.national_id, d.name AS department_name, pos.name AS position_name, pf.name AS pay_frequency_name FROM employee e INNER JOIN person p ON p.person_id = e.person_id INNER JOIN department d ON d.department_id = e.department_id INNER JOIN position pos ON pos.position_id = e.position_id INNER JOIN pay_frequency pf ON pf.pay_frequency_id = e.pay_frequency_id WHERE e.is_active = TRUE ORDER BY e.employee_id",
     "findEmployee": "SELECT e.*, p.first_name, p.last_name, p.national_id, d.name AS department_name, pos.name AS position_name, pf.name AS pay_frequency_name FROM employee e INNER JOIN person p ON p.person_id = e.person_id INNER JOIN department d ON d.department_id = e.department_id INNER JOIN position pos ON pos.position_id = e.position_id INNER JOIN pay_frequency pf ON pf.pay_frequency_id = e.pay_frequency_id WHERE e.employee_id = $1",
     "insertEmployee": "INSERT INTO employee (person_id, hire_date, pay_modality, base_salary, pay_frequency_id, department_id, position_id) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *",
     "updateEmployee": "UPDATE employee SET hire_date = $2, pay_modality = $3, base_salary = $4, pay_frequency_id = $5, department_id = $6, position_id = $7, updated_at = NOW() WHERE employee_id = $1 RETURNING *",
     "deleteEmployee": "UPDATE employee SET is_active = FALSE, updated_at = NOW() WHERE employee_id = $1 RETURNING *"
   },
   "Concept": {
-    "listConcepts": "SELECT * FROM concept ORDER BY concept_id",
+    "listConcepts": "SELECT * FROM concept WHERE is_active = TRUE ORDER BY concept_id",
     "findConcept": "SELECT * FROM concept WHERE concept_id = $1",
     "insertConcept": "INSERT INTO concept (name, effect, category, is_automatic, calc_type, calc_value) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *",
     "updateConcept": "UPDATE concept SET name = $2, effect = $3, category = $4, is_automatic = $5, calc_type = $6, calc_value = $7 WHERE concept_id = $1 RETURNING *",
@@ -58,5 +58,31 @@
     "insertLoan": "INSERT INTO loan (employee_id, total_amount, remaining_balance, installment, start_date, status) VALUES ($1, $2, $3, $4, $5, COALESCE($6, 'ACTIVE')) RETURNING *",
     "updateLoan": "UPDATE loan SET remaining_balance = $2, installment = $3, status = $4, updated_at = NOW() WHERE loan_id = $1 RETURNING *",
     "deleteLoan": "UPDATE loan SET status = 'PAID', remaining_balance = 0, updated_at = NOW() WHERE loan_id = $1 RETURNING *"
+  },
+  "PayrollEntry": {
+    "listPayrollEntries": "SELECT pe.*, p.first_name, p.last_name FROM payroll_entry pe INNER JOIN employee e ON e.employee_id = pe.employee_id INNER JOIN person p ON p.person_id = e.person_id WHERE pe.payroll_id = $1 ORDER BY pe.payroll_entry_id",
+    "findPayrollEntry": "SELECT pe.*, p.first_name, p.last_name FROM payroll_entry pe INNER JOIN employee e ON e.employee_id = pe.employee_id INNER JOIN person p ON p.person_id = e.person_id WHERE pe.payroll_entry_id = $1",
+    "insertPayrollEntry": "INSERT INTO payroll_entry (payroll_id, employee_id) VALUES ($1, $2) RETURNING *",
+    "deletePayrollEntry": "DELETE FROM payroll_entry WHERE payroll_entry_id = $1 RETURNING *"
+  },
+  "PayrollDetail": {
+    "listPayrollDetails": "SELECT d.*, c.name AS concept_name, c.effect FROM payroll_detail d INNER JOIN concept c ON c.concept_id = d.concept_id WHERE d.payroll_entry_id = $1 ORDER BY d.payroll_detail_id",
+    "insertPayrollDetail": "INSERT INTO payroll_detail (payroll_entry_id, concept_id, quantity, amount) VALUES ($1, $2, COALESCE($3, 1), $4) RETURNING *",
+    "deletePayrollDetail": "DELETE FROM payroll_detail WHERE payroll_detail_id = $1 RETURNING *"
+  },
+  "Payment": {
+    "listPayments": "SELECT * FROM payment WHERE payroll_entry_id = $1 ORDER BY payment_id",
+    "findPayment": "SELECT * FROM payment WHERE payment_id = $1",
+    "insertPayment": "INSERT INTO payment (payroll_entry_id, payment_date, amount, payment_method, notes) VALUES ($1, $2, $3, $4, $5) RETURNING *"
+  },
+  "Profile": {
+    "listProfiles": "SELECT * FROM profile ORDER BY profile_id",
+    "findProfile": "SELECT * FROM profile WHERE profile_id = $1"
+  },
+  "Permission": {
+    "listMethods": "SELECT m.method_id, m.method_de, o.object_id, o.object_de FROM method m INNER JOIN object o ON o.object_id = m.object_id WHERE m.method_atx = TRUE ORDER BY o.object_de, m.method_de",
+    "listPermissionsByProfile": "SELECT permission_id, profile_id, method_id, method_de, object_de FROM v_profile_permission WHERE profile_id = $1 AND method_id IS NOT NULL ORDER BY object_de, method_de",
+    "grantPermission": "INSERT INTO permission (profile_id, method_id) VALUES ($1, $2) ON CONFLICT (profile_id, method_id) DO NOTHING RETURNING *",
+    "revokePermission": "DELETE FROM permission WHERE profile_id = $1 AND method_id = $2 RETURNING *"
   }
 }

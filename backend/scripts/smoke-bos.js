@@ -25,7 +25,12 @@ const bos = [
   'Employee',
   'Concept',
   'Payroll',
-  'Loan'
+  'PayrollEntry',
+  'PayrollDetail',
+  'Payment',
+  'Loan',
+  'Profile',
+  'Permission'
 ];
 
 let ok = true;

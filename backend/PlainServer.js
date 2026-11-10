@@ -3,11 +3,9 @@ const express = require('express');
 const cors = require('cors');
 const path = require('path');
 const fs = require('fs');
-const Valid = require('./Validate');
 const DBComponent = require('./DBComponent');
 const Session = require('./Session');
 const Security = require('./Security');
-const Reflex = require('./Reflex');
 const Logger = require('./Log');
 
 function deepMerge(base, overlay) {
@@ -40,14 +38,11 @@ if (process.env.PGHOST) config.db.host = process.env.PGHOST;
 global.query = JSON.parse(fs.readFileSync(path.join(__dirname, 'Querys.json'), 'utf8'));
 global.db = new DBComponent();
 global.log = new Logger(fs);
-global.valid = new Valid();
 
 const app = express();
 
-// Capas: Session | Reflex (classMap) | Security (permissionMap) | Validate (validationMap)
 global.sess = new Session(session, app);
-global.reflex = new Reflex();
-global.sec = new Security(global.reflex);
+global.sec = new Security();
 
 log.info('Iniciando framework de nómina...');
 
@@ -96,11 +91,16 @@ app.get('/me', (req, res) => {
   sess.me(req, res);
 });
 
-app.listen(config.server.port, () => {
-  console.log(
-    `Servidor de nómina activo en http://${config.server.ip}:${config.server.port}`
-  );
-  log.info(
-    `Servidor activo en http://${config.server.ip}:${config.server.port}`
-  );
-});
+async function start() {
+  await sec.loadPermission();
+  app.listen(config.server.port, () => {
+    console.log(
+      `Servidor de nómina activo en http://${config.server.ip}:${config.server.port}`
+    );
+    log.info(
+      `Servidor activo en http://${config.server.ip}:${config.server.port}`
+    );
+  });
+}
+
+start();

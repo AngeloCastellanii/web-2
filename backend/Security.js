@@ -1,67 +1,63 @@
-/**
- * Seguridad desacoplada: permisos en Map.
- * No conoce la lógica de negocio; solo autoriza y delega a Reflex.execute.
- */
 const Security = class {
-  constructor(reflex) {
-    this.reflex = reflex;
+  constructor() {
     this.permissionMethod = new Map();
-    this.loadPermission();
   }
 
-  loadPermission() {
-    db.query(query.Security.loadPermissions, null).then((r) => {
-      if (!r) {
-        log.error('No se pudieron cargar los permisos');
-        return;
-      }
-      this.permissionMethod.clear();
-      r.forEach((element) => {
-        const key =
-          element.object_de + '_' + element.method_de + '_' + element.profile_id;
-        this.permissionMethod.set(key, true);
-      });
-      log.info(`Permisos cargados en Map: ${this.permissionMethod.size}`);
+  async loadPermission() {
+    const r = await db.query(query.Security.loadPermissions, null);
+    if (!r) {
+      log.error('No se pudieron cargar los permisos');
+      return;
+    }
+    this.permissionMethod.clear();
+    r.forEach((element) => {
+      const key = element.object_de + '_' + element.method_de + '_' + element.profile_id;
+      this.permissionMethod.set(key, true);
     });
-  }
-
-  buildKey(object_de, method_de, profile_id) {
-    return object_de + '_' + method_de + '_' + profile_id;
+    log.info(`Permisos cargados en Map: ${this.permissionMethod.size}`);
   }
 
   getPermission(objPermission) {
-    const key = this.buildKey(
-      objPermission.object_de,
-      objPermission.method_de,
-      objPermission.profile_id
-    );
-    return this.permissionMethod.has(key)
-      ? this.permissionMethod.get(key)
-      : false;
+    const key =
+      objPermission.object_de + '_' + objPermission.method_de + '_' + objPermission.profile_id;
+    return this.permissionMethod.has(key) ? this.permissionMethod.get(key) : false;
   }
 
-  /**
-   * Flujo desacoplado:
-   * permiso (Map) -> ValidationMap -> Reflex.execute
-   */
   async exeMethod(obj) {
     if (!this.getPermission(obj)) {
-      obj.res.send(JSON.stringify({ msg: 'Acceso denegado' }));
+      obj.res.json({ msg: 'Acceso denegado' });
       return;
     }
 
-    const check = valid.validate(obj.object_de, obj.method_de, obj.params || []);
-    if (!check.ok) {
-      obj.res.send(JSON.stringify({ msg: check.msg, err: 'validation' }));
+    if (!/^[A-Za-z]+$/.test(obj.object_de || '')) {
+      obj.res.json({ msg: 'Objeto no válido' });
       return;
     }
 
-    await this.reflex.execute(
-      obj.object_de,
-      obj.method_de,
-      obj.params || [],
-      obj
-    );
+    let ClassRef;
+    try {
+      ClassRef = require(`./BO/${obj.object_de}`);
+    } catch (ex) {
+      obj.res.json({ msg: 'Objeto no registrado', err: obj.object_de });
+      return;
+    }
+
+    const instance = new ClassRef({ db: obj.db, query: obj.query });
+    const method = instance[obj.method_de];
+    if (typeof method !== 'function') {
+      obj.res.json({ msg: 'Método no encontrado', err: obj.method_de });
+      return;
+    }
+
+    try {
+      const result = await method.apply(instance, obj.params || []);
+      obj.res.json(result);
+    } catch (ex) {
+      log.error(ex.message || ex);
+      obj.res
+        .status(500)
+        .json({ msg: 'Error de ejecución', err: String(ex.message || ex) });
+    }
   }
 };
 

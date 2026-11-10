@@ -8,6 +8,8 @@ import Employees from './pages/Employees';
 import Concepts from './pages/Concepts';
 import Payrolls from './pages/Payrolls';
 import Loans from './pages/Loans';
+import Profiles from './pages/Profiles';
+import Permissions from './pages/Permissions';
 
 function PrivateRoute({ children }) {
   const { user, loading } = useAuth();
@@ -36,6 +38,8 @@ export default function App() {
             <Route path="concepts" element={<Concepts />} />
             <Route path="payrolls" element={<Payrolls />} />
             <Route path="loans" element={<Loans />} />
+            <Route path="profiles" element={<Profiles />} />
+            <Route path="permissions" element={<Permissions />} />
           </Route>
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>

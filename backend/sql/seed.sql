@@ -48,7 +48,12 @@ INSERT INTO object (object_de) VALUES
   ('Employee'),
   ('Concept'),
   ('Payroll'),
-  ('Loan');
+  ('PayrollEntry'),
+  ('PayrollDetail'),
+  ('Payment'),
+  ('Loan'),
+  ('Profile'),
+  ('Permission');
 
 -- Helper: insert methods for an object by name
 -- Department
@@ -69,7 +74,7 @@ SELECT object_id, m FROM object, (VALUES
 
 INSERT INTO method (object_id, method_de)
 SELECT object_id, m FROM object, (VALUES
-  ('listPersons'), ('findPerson'), ('insertPerson'), ('updatePerson'), ('deletePerson')
+  ('listPersons'), ('findPerson'), ('findPersonByNationalId'), ('insertPerson'), ('updatePerson'), ('deletePerson')
 ) AS t(m) WHERE object_de = 'Person';
 
 INSERT INTO method (object_id, method_de)
@@ -89,14 +94,51 @@ SELECT object_id, m FROM object, (VALUES
 
 INSERT INTO method (object_id, method_de)
 SELECT object_id, m FROM object, (VALUES
+  ('listPayrollEntries'), ('findPayrollEntry'), ('insertPayrollEntry'), ('deletePayrollEntry')
+) AS t(m) WHERE object_de = 'PayrollEntry';
+
+INSERT INTO method (object_id, method_de)
+SELECT object_id, m FROM object, (VALUES
+  ('listPayrollDetails'), ('insertPayrollDetail'), ('deletePayrollDetail')
+) AS t(m) WHERE object_de = 'PayrollDetail';
+
+INSERT INTO method (object_id, method_de)
+SELECT object_id, m FROM object, (VALUES
+  ('listPayments'), ('findPayment'), ('insertPayment')
+) AS t(m) WHERE object_de = 'Payment';
+
+INSERT INTO method (object_id, method_de)
+SELECT object_id, m FROM object, (VALUES
   ('listLoans'), ('findLoan'), ('insertLoan'), ('updateLoan'), ('deleteLoan')
 ) AS t(m) WHERE object_de = 'Loan';
 
--- Admin gets all permissions
+INSERT INTO method (object_id, method_de)
+SELECT object_id, m FROM object, (VALUES
+  ('listProfiles'), ('findProfile')
+) AS t(m) WHERE object_de = 'Profile';
+
+INSERT INTO method (object_id, method_de)
+SELECT object_id, m FROM object, (VALUES
+  ('listMethods'), ('listPermissionsByProfile'), ('grantPermission'), ('revokePermission')
+) AS t(m) WHERE object_de = 'Permission';
+
+-- Admin: todos los métodos, incluidos Profile y Permission
 INSERT INTO permission (profile_id, method_id)
 SELECT 1, method_id FROM method WHERE method_atx = TRUE;
 
--- HR gets most CRUD except security-related (all payroll BOs)
+-- HR: negocio, sin administrar perfiles ni permisos
 INSERT INTO permission (profile_id, method_id)
-SELECT 2, method_id FROM method WHERE method_atx = TRUE
-ON CONFLICT DO NOTHING;
+SELECT 2, m.method_id
+FROM method m
+INNER JOIN object o ON o.object_id = m.object_id
+WHERE m.method_atx = TRUE
+  AND o.object_de NOT IN ('Profile', 'Permission');
+
+-- Employee: solo listar y buscar
+INSERT INTO permission (profile_id, method_id)
+SELECT 3, m.method_id
+FROM method m
+INNER JOIN object o ON o.object_id = m.object_id
+WHERE m.method_atx = TRUE
+  AND o.object_de IN ('Department', 'Position', 'PayFrequency', 'Employee', 'Concept', 'Payroll', 'Loan')
+  AND (m.method_de LIKE 'list%' OR m.method_de LIKE 'find%');

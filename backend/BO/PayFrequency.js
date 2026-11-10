@@ -12,8 +12,9 @@
 
   async findPayFrequency(id) {
     const r = await this.db.query(this.query.PayFrequency.findPayFrequency, [id]);
-    if (r && r.length > 0) return { msg: 'ok', data: r[0] };
-    return { msg: 'Pay frequency no encontrado', err: 'no encontrado' };
+    if (r === false) return { msg: 'Error al buscar periodicidad', err: 'error sql' };
+    if (!r.length) return { msg: 'Periodicidad no encontrada', err: 'no encontrado' };
+    return { msg: 'ok', data: r[0] };
   }
 };
 

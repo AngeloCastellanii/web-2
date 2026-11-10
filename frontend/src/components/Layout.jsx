@@ -10,6 +10,11 @@ const links = [
   { to: '/loans', label: 'Préstamos' }
 ];
 
+const adminLinks = [
+  { to: '/profiles', label: 'Perfiles' },
+  { to: '/permissions', label: 'Permisos' }
+];
+
 export default function Layout() {
   const { user, logout } = useAuth();
 
@@ -29,6 +34,18 @@ export default function Layout() {
             {l.label}
           </NavLink>
         ))}
+        {user?.profile_id === 1 &&
+          adminLinks.map((l) => (
+            <NavLink
+              key={l.to}
+              to={l.to}
+              className={({ isActive }) =>
+                isActive ? 'nav-link active' : 'nav-link'
+              }
+            >
+              {l.label}
+            </NavLink>
+          ))}
         <div className="sidebar-footer">
           <div className="user-chip">
             {user?.first_name || user?.user_na || user?.email}
